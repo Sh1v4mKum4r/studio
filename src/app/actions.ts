@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { aiHealthChatbot } from '@/ai/flows/ai-health-chatbot';
 import { analyzeHealthStatsAndGenerateAlerts } from '@/ai/flows/automated-health-alerts';
+import { initializeServerApp } from '@/firebase/server';
 
 // Schemas
 const healthStatSchema = z.object({
@@ -19,10 +20,6 @@ const healthStatSchema = z.object({
 const appointmentSchema = z.object({
   patientName: z.string().min(1),
   doctorId: z.string().min(1),
-  // ISO datetime string
-  datetime: z.string().refine((s) => !Number.isNaN(Date.parse(s)), {
-    message: 'datetime must be a valid ISO date string',
-  }),
   reason: z.string().max(1000).optional(),
 });
 
@@ -38,12 +35,11 @@ const reminderSchema = z.object({
 // Actions
 
 export async function submitHealthStat(values: unknown) {
-  console.log('[submitHealthStat] incoming:', values);
+  console.log('[submitHealthStat] incoming for AI analysis:', values);
   try {
     const parsed = healthStatSchema.parse(values);
-    console.log('[submitHealthStat] parsed:', parsed);
     
-    // The database write is now handled on the client.
+    // The database write is handled on the client.
     // This server action is only for AI analysis.
 
     const result = await analyzeHealthStatsAndGenerateAlerts({
@@ -86,24 +82,13 @@ export async function getChatbotResponse(userId: string, question: string) {
 }
 
 export async function submitAppointment(values: unknown) {
-  console.log('[submitAppointment] incoming:', values);
+  console.log('[submitAppointment] incoming for server-side processing:', values);
   try {
     const parsed = appointmentSchema.parse(values);
-    const appointmentDate = new Date(parsed.datetime);
-    const appointment = {
-      apptId: uuidv4(),
-      patientName: parsed.patientName,
-      userId: 'user123',
-      doctorId: parsed.doctorId,
-      date: appointmentDate.toISOString().split('T')[0],
-      time: appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      reason: parsed.reason ?? 'General Checkup',
-      status: 'pending' as const,
-      createdAt: new Date().toISOString(),
-    };
-    console.log('[submitAppointment] created:', appointment);
-    // TODO: persist appointment to DB
-    return { success: true, appointment };
+    // DB write is handled client-side.
+    // This action can be used for notifications, etc.
+    console.log('[submitAppointment] parsed for server action:', parsed);
+    return { success: true };
   } catch (err) {
     console.error('[submitAppointment] error:', err);
     if (err instanceof z.ZodError) return { success: false, errorType: 'validation', issues: err.errors };
@@ -112,7 +97,7 @@ export async function submitAppointment(values: unknown) {
 }
 
 export async function submitSOS(values: unknown) {
-  console.log('[submitSOS] incoming:', values);
+  console.log('[submitSOS] incoming for server-side processing:', values);
   try {
     const schema = z.object({
       userId: z.string().min(1),
@@ -121,17 +106,12 @@ export async function submitSOS(values: unknown) {
       note: z.string().max(1000).optional(),
     });
     const parsed = schema.parse(values);
-    const sos = {
-      id: uuidv4(),
-      userId: parsed.userId,
-      location: { lat: parsed.lat, lng: parsed.lng },
-      note: parsed.note ?? null,
-      createdAt: new Date().toISOString(),
-    };
-    console.log('[submitSOS] created:', sos);
-    // TODO: persist / notify emergency contacts
-    return { success: true, sos };
-  } catch (err) {
+    // DB write is handled client-side.
+    // This action can be used for notifications, etc.
+    console.log('[submitSOS] parsed for server action:', parsed);
+    // TODO: notify emergency contacts
+    return { success: true };
+  } catch (err)_ {
     console.error('[submitSOS] error:', err);
     if (err instanceof z.ZodError) return { success: false, errorType: 'validation', issues: err.errors };
     return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
@@ -139,20 +119,14 @@ export async function submitSOS(values: unknown) {
 }
 
 export async function submitReminder(values: unknown) {
-  console.log('[submitReminder] incoming:', values);
+  console.log('[submitReminder] incoming for server-side processing:', values);
   try {
-    const parsed = reminderSchema.parse(values);
-    const reminder = {
-      remId: uuidv4(),
-      title: parsed.title,
-      datetime: new Date(parsed.datetime).toISOString(),
-      note: parsed.note ?? null,
-      userId: parsed.userId ?? 'user123',
-      createdAt: new Date().toISOString(),
-    };
-    console.log('[submitReminder] created:', reminder);
-    // TODO: persist reminder to DB
-    return { success: true, reminder };
+    // This schema is simplified as we are not using all fields from the client
+    const parsed = z.object({ title: z.string() }).parse(values);
+     // DB write is handled client-side.
+    // This action can be used for queuing push notifications, etc.
+    console.log('[submitReminder] parsed for server action:', parsed);
+    return { success: true };
   } catch (err) {
     console.error('[submitReminder] error:', err);
     if (err instanceof z.ZodError) return { success: false, errorType: 'validation', issues: err.errors };

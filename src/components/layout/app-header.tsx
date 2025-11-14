@@ -26,7 +26,7 @@ export function AppHeader({ userName }: AppHeaderProps) {
         <div className="flex items-center gap-2">
           <AddHealthStatDialog />
           {user && (
-            <SOSButton userId={user.uid} />
+            <SOSButton />
           )}
         </div>
       </div>

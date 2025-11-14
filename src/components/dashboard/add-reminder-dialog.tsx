@@ -22,6 +22,10 @@ import { submitReminder } from '@/app/actions';
 import { Loader2, Plus } from 'lucide-react';
 import type { Reminder } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { useFirestore, useUser } from '@/firebase';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
 
 const reminderSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -38,6 +42,8 @@ export function AddReminderDialog({ onReminderAdded }: AddReminderDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = useFirestore();
 
   const form = useForm<z.infer<typeof reminderSchema>>({
     resolver: zodResolver(reminderSchema),
@@ -50,40 +56,58 @@ export function AddReminderDialog({ onReminderAdded }: AddReminderDialogProps) {
   });
 
   async function onSubmit(values: z.infer<typeof reminderSchema>) {
+    if (!user) {
+      toast({ title: "Not Authenticated", description: "You must be logged in to add a reminder.", variant: "destructive" });
+      return;
+    }
     setIsSubmitting(true);
     
     const [hours, minutes] = values.datetime.split(':');
     const reminderDate = new Date();
     reminderDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
-    const result = await submitReminder({
+    const newReminder = {
+      remId: uuidv4(),
+      userId: user.uid,
       title: values.title,
       datetime: reminderDate.toISOString(),
+      reminderDateTime: reminderDate.toISOString(),
       type: values.type,
-      note: values.note,
-      userId: 'user123',
-    });
-    
-    setIsSubmitting(false);
+      reminderType: values.type,
+      note: values.note ?? null,
+      message: values.title,
+      isCompleted: false,
+      createdAt: new Date().toISOString(),
+    };
 
-    if (result.success && result.reminder) {
+    try {
+      const remindersCol = collection(firestore, `users/${user.uid}/reminders`);
+      await addDocumentNonBlocking(remindersCol, newReminder);
+
+      // This server action can be used for other side-effects, like queuing a push notification
+      await submitReminder(values);
+
       const displayReminder: Reminder = {
-        ...result.reminder,
-        time: new Date(result.reminder.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        ...newReminder,
+        time: new Date(newReminder.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       onReminderAdded(displayReminder);
+      
       toast({
         title: 'Reminder Set!',
         description: `We'll remind you about "${values.title}".`,
       });
       form.reset();
       setIsOpen(false);
-    } else {
-      toast({
+    } catch (error) {
+      console.error("Error adding reminder:", error);
+       toast({
         title: 'Error',
         description: 'Could not save reminder. Please try again.',
         variant: 'destructive',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 

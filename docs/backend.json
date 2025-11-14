@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -142,7 +143,7 @@
       "type": "object",
       "description": "Represents an appointment between a patient and a doctor.",
       "properties": {
-        "id": {
+        "apptId": {
           "type": "string",
           "description": "Unique identifier for the appointment."
         },
@@ -159,16 +160,22 @@
           "description": "Date and time of the appointment.",
           "format": "date-time"
         },
-        "notes": {
+        "reason": {
           "type": "string",
-          "description": "Notes about the appointment."
+          "description": "Reason for the appointment."
+        },
+        "status": {
+            "type": "string",
+            "description": "The status of the appointment.",
+            "enum": ["pending", "confirmed", "cancelled"]
         }
       },
       "required": [
-        "id",
+        "apptId",
         "patientId",
         "doctorId",
-        "appointmentDateTime"
+        "appointmentDateTime",
+        "status"
       ]
     },
     "Reminder": {
@@ -177,7 +184,7 @@
       "type": "object",
       "description": "Represents a reminder for medication or vaccination.",
       "properties": {
-        "id": {
+        "remId": {
           "type": "string",
           "description": "Unique identifier for the reminder."
         },
@@ -201,14 +208,18 @@
         "isCompleted": {
           "type": "boolean",
           "description": "Indicates if the reminder has been completed."
+        },
+        "title": {
+            "type": "string"
         }
       },
       "required": [
-        "id",
+        "remId",
         "userId",
         "reminderType",
         "reminderDateTime",
-        "message"
+        "message",
+        "title"
       ]
     },
     "SosEvent": {
@@ -231,8 +242,12 @@
           "format": "date-time"
         },
         "location": {
-          "type": "string",
-          "description": "Location of the user during the SOS event (e.g., coordinates)."
+          "type": "object",
+          "description": "Location of the user during the SOS event (e.g., coordinates).",
+          "properties": {
+              "lat": {"type": "number"},
+              "lng": {"type": "number"}
+          }
         },
         "message": {
           "type": "string",

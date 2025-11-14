@@ -18,12 +18,15 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { submitAppointment } from '@/app/actions';
 import { Loader2 } from 'lucide-react';
 import type { Doctor } from '@/lib/types';
 import { format } from 'date-fns';
+import { useFirestore, useUser } from '@/firebase';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
 
 const appointmentSchema = z.object({
   patientName: z.string().min(1, "Patient name is required"),
@@ -35,14 +38,15 @@ type AddAppointmentDialogProps = {
   selectedDate: Date;
   timeSlot: string;
   doctors: Doctor[];
-  userId: string;
   onAppointmentBooked: (newAppointment: any) => void;
 };
 
-export function AddAppointmentDialog({ selectedDate, timeSlot, doctors, userId, onAppointmentBooked }: AddAppointmentDialogProps) {
+export function AddAppointmentDialog({ selectedDate, timeSlot, doctors, onAppointmentBooked }: AddAppointmentDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = useFirestore();
 
   const form = useForm<z.infer<typeof appointmentSchema>>({
     resolver: zodResolver(appointmentSchema),
@@ -54,7 +58,12 @@ export function AddAppointmentDialog({ selectedDate, timeSlot, doctors, userId, 
   });
 
   async function onSubmit(values: z.infer<typeof appointmentSchema>) {
+    if (!user) {
+        toast({ title: "Not Authenticated", description: "You must be logged in to book an appointment.", variant: "destructive" });
+        return;
+    }
     setIsSubmitting(true);
+    
     const appointmentDateTime = new Date(selectedDate);
     const [time, period] = timeSlot.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
@@ -62,28 +71,43 @@ export function AddAppointmentDialog({ selectedDate, timeSlot, doctors, userId, 
     if (period === 'AM' && hours === 12) hours = 0;
     appointmentDateTime.setHours(hours, minutes, 0, 0);
 
-    const result = await submitAppointment({
-      ...values,
-      datetime: appointmentDateTime.toISOString(),
-      userId,
-    });
+    const newAppointment = {
+      apptId: uuidv4(),
+      patientId: user.uid,
+      patientName: values.patientName,
+      doctorId: values.doctorId,
+      appointmentDateTime: appointmentDateTime.toISOString(),
+      date: format(appointmentDateTime, 'yyyy-MM-dd'),
+      time: format(appointmentDateTime, 'hh:mm a'),
+      reason: values.reason,
+      status: 'pending' as const,
+      createdAt: new Date().toISOString(),
+    };
 
-    setIsSubmitting(false);
+    try {
+        const appointmentsCol = collection(firestore, 'appointments');
+        await addDocumentNonBlocking(appointmentsCol, newAppointment);
+        
+        // This server action could be used for other side effects, e.g. notifications
+        await submitAppointment(values);
 
-    if (result.success && result.appointment) {
-      toast({
-        title: 'Appointment Requested!',
-        description: `Your appointment request has been sent and is now pending confirmation.`,
-      });
-      onAppointmentBooked(result.appointment);
-      form.reset();
-      setIsOpen(false);
-    } else {
-      toast({
-        title: 'Error',
-        description: 'Something went wrong.',
-        variant: 'destructive',
-      });
+        toast({
+            title: 'Appointment Requested!',
+            description: `Your appointment request has been sent and is now pending confirmation.`,
+        });
+        onAppointmentBooked(newAppointment);
+        form.reset();
+        setIsOpen(false);
+
+    } catch(error) {
+        console.error("Error booking appointment", error);
+        toast({
+            title: 'Error',
+            description: 'Something went wrong while booking the appointment.',
+            variant: 'destructive',
+        });
+    } finally {
+        setIsSubmitting(false);
     }
   }
 
