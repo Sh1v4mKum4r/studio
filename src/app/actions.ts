@@ -33,20 +33,10 @@ const reminderSchema = z.object({
 });
 
 export async function submitHealthStat(values: unknown) {
-  // In a real app, you would get user/doctor info from the session
-  const dummyData = {
-    userId: 'user123',
-    userName: 'Jane Doe',
-    doctorId: 'doc456',
-    doctorName: 'Dr. Carter',
-  };
-
+  console.log('[submitHealthStat] incoming values:', values);
   try {
-    // Validate and coerce incoming values
     const parsed = healthStatSchema.parse(values);
-
-    // debug: show parsed values in server logs
-    console.log('submitHealthStat parsed values:', parsed);
+    console.log('[submitHealthStat] parsed:', parsed);
 
     const result = await analyzeHealthStatsAndGenerateAlerts({
       systolic: parsed.systolic,
@@ -55,41 +45,43 @@ export async function submitHealthStat(values: unknown) {
       weight: parsed.weight,
       heartRate: parsed.heartRate,
       timestamp: new Date().toISOString(),
-      ...dummyData,
+      userId: 'user123',
+      userName: 'Jane Doe',
+      doctorId: 'doc456',
+      doctorName: 'Dr. Carter',
     });
-    
-    // In a real app, you would save the new health stat and the alert to Firestore here.
-    
+
+    console.log('[submitHealthStat] analyzer result:', result);
     return { success: true, alert: result };
-  } catch (error) {
-    console.error('Error analyzing health stats:', error);
-    return { success: false, error: (error as Error)?.message ?? String(error) };
+  } catch (err) {
+    console.error('[submitHealthStat] error:', err);
+    if (err instanceof z.ZodError) {
+      return { success: false, errorType: 'validation', issues: err.errors };
+    }
+    return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
   }
 }
 
 export async function getChatbotResponse(userId: string, question: string) {
-    const trimmed = question?.trim();
-    if (!trimmed) {
-        return { answer: "Please provide a question." };
-    }
+  console.log('[getChatbotResponse] userId:', userId, 'question:', question);
+  const trimmedQ = question?.trim();
+  if (!trimmedQ) return { success: false, errorType: 'validation', message: 'Empty question' };
+  if (!userId || !userId.trim()) return { success: false, errorType: 'validation', message: 'Invalid userId' };
 
-    if (!userId || !userId.trim()) {
-        return { answer: "Invalid user ID." };
-    }
-    
-    try {
-        const response = await aiHealthChatbot({ userId: userId.trim(), question: trimmed });
-        return response;
-    } catch (error) {
-        console.error('Error getting chatbot response:', error);
-        return { answer: "I'm sorry, I encountered an error. Please try again later." };
-    }
+  try {
+    const response = await aiHealthChatbot({ userId: userId.trim(), question: trimmedQ });
+    console.log('[getChatbotResponse] response:', response);
+    return { success: true, response };
+  } catch (err) {
+    console.error('[getChatbotResponse] error:', err);
+    return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
+  }
 }
 
 export async function submitAppointment(values: unknown) {
+  console.log('[submitAppointment] incoming values:', values);
   try {
     const parsed = appointmentSchema.parse(values);
-
     const appointment = {
       id: uuidv4(),
       patientName: parsed.patientName,
@@ -97,20 +89,18 @@ export async function submitAppointment(values: unknown) {
       datetime: new Date(parsed.datetime).toISOString(),
       reason: parsed.reason ?? null,
       createdAt: new Date().toISOString(),
-      // attach any user/session data here if needed
     };
-
-    // TODO: persist `appointment` to your DB (Firestore / Prisma / etc.)
-    console.log('submitAppointment created:', appointment);
-
+    console.log('[submitAppointment] created:', appointment);
     return { success: true, appointment };
   } catch (err) {
-    console.error('submitAppointment error:', err);
-    return { success: false, error: (err as Error)?.message ?? String(err) };
+    console.error('[submitAppointment] error:', err);
+    if (err instanceof z.ZodError) return { success: false, errorType: 'validation', issues: err.errors };
+    return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
   }
 }
 
 export async function submitSOS(values: unknown) {
+  console.log('[submitSOS] incoming values:', values);
   try {
     const schema = z.object({
       userId: z.string().min(1),
@@ -119,7 +109,6 @@ export async function submitSOS(values: unknown) {
       note: z.string().max(1000).optional(),
     });
     const parsed = schema.parse(values);
-
     const sos = {
       id: uuidv4(),
       userId: parsed.userId,
@@ -127,22 +116,19 @@ export async function submitSOS(values: unknown) {
       note: parsed.note ?? null,
       createdAt: new Date().toISOString(),
     };
-
-    // TODO: persist/send alert (DB, SMS, push, webhook)
-    console.log('submitSOS created:', sos);
-
+    console.log('[submitSOS] created:', sos);
     return { success: true, sos };
   } catch (err) {
-    console.error('submitSOS error:', err);
-    return { success: false, error: (err as Error)?.message ?? String(err) };
+    console.error('[submitSOS] error:', err);
+    if (err instanceof z.ZodError) return { success: false, errorType: 'validation', issues: err.errors };
+    return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
   }
 }
 
-// NEW: reminder schema + server action
 export async function submitReminder(values: unknown) {
+  console.log('[submitReminder] incoming values:', values);
   try {
     const parsed = reminderSchema.parse(values);
-
     const reminder = {
       id: uuidv4(),
       title: parsed.title,
@@ -151,13 +137,11 @@ export async function submitReminder(values: unknown) {
       userId: parsed.userId ?? 'user123',
       createdAt: new Date().toISOString(),
     };
-
-    // TODO: persist `reminder` to your DB (Firestore / Prisma / etc.)
-    console.log('submitReminder created:', reminder);
-
+    console.log('[submitReminder] created:', reminder);
     return { success: true, reminder };
   } catch (err) {
-    console.error('submitReminder error:', err);
-    return { success: false, error: (err as Error)?.message ?? String(err) };
+    console.error('[submitReminder] error:', err);
+    if (err instanceof z.ZodError) return { success: false, errorType: 'validation', issues: err.errors };
+    return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
   }
 }
