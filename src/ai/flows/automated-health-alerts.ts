@@ -12,9 +12,8 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const HealthStatsInputSchema = z.object({
-  bloodPressure: z
-    .number()
-    .describe('Systolic blood pressure in mmHg'),
+  systolic: z.number().describe('Systolic blood pressure in mmHg'),
+  diastolic: z.number().describe('Diastolic blood pressure in mmHg'),
   sugarLevel: z.number().describe('Blood sugar level in mg/dL'),
   timestamp: z.string().describe('Timestamp of the health stats entry'),
   userId: z.string().describe('The ID of the user to send the alert to.'),
@@ -46,13 +45,13 @@ const prompt = ai.definePrompt({
   Based on the provided health stats, determine the alert level and generate a message.
 
   Health Stats:
-  - Blood Pressure: {{{bloodPressure}}} mmHg
+  - Blood Pressure: {{{systolic}}}/{{{diastolic}}} mmHg
   - Sugar Level: {{{sugarLevel}}} mg/dL
   - Timestamp: {{{timestamp}}}
 
   Alert Criteria:
-  - Critical: BP ≥ 160 or Sugar ≥ 250
-  - Warning: BP ≥ 140 or Sugar ≥ 180
+  - Critical: Systolic BP ≥ 160 or Diastolic BP ≥ 100 or Sugar ≥ 250
+  - Warning: Systolic BP ≥ 140 or Diastolic BP ≥ 90 or Sugar ≥ 180
   - Normal: Otherwise
 
   Include the user's name ({{{userName}}}) and the doctor's name ({{{doctorName}}}) in the message.
@@ -65,7 +64,7 @@ const prompt = ai.definePrompt({
   Example:
   {
     "alertLevel": "warning",
-    "alertMessage": "Warning: Blood pressure is elevated ({{{bloodPressure}}} mmHg). Please rest and monitor. Contact your doctor if it remains high. Doctor {{{doctorName}}} has been notified.",
+    "alertMessage": "Warning: Blood pressure is elevated ({{{systolic}}}/{{{diastolic}}} mmHg). Please rest and monitor. Contact your doctor if it remains high. Doctor {{{doctorName}}} has been notified.",
     "shouldSendNotification": true
   }
   `,

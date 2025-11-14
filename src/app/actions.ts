@@ -23,7 +23,8 @@ export async function submitHealthStat(values: z.infer<typeof healthStatSchema>)
 
   try {
     const result = await analyzeHealthStatsAndGenerateAlerts({
-      bloodPressure: values.systolic, // Assuming systolic is the main value for analysis
+      systolic: values.systolic,
+      diastolic: values.diastolic,
       sugarLevel: values.sugarLevel,
       timestamp: new Date().toISOString(),
       ...dummyData,
