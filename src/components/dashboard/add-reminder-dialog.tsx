@@ -20,14 +20,21 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { submitReminder } from '@/app/actions';
 import { Loader2, Plus } from 'lucide-react';
+import type { Reminder } from '@/lib/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 const reminderSchema = z.object({
   title: z.string().min(1, "Title is required"),
   datetime: z.string().min(1, "Time is required"),
+  type: z.enum(['medication', 'vaccination']),
   note: z.string().optional(),
 });
 
-export function AddReminderDialog() {
+type AddReminderDialogProps = {
+  onReminderAdded: (reminder: Reminder) => void;
+};
+
+export function AddReminderDialog({ onReminderAdded }: AddReminderDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -37,6 +44,7 @@ export function AddReminderDialog() {
     defaultValues: {
       title: '',
       datetime: '',
+      type: 'medication',
       note: '',
     },
   });
@@ -44,20 +52,26 @@ export function AddReminderDialog() {
   async function onSubmit(values: z.infer<typeof reminderSchema>) {
     setIsSubmitting(true);
     
-    // Create a valid date from today and the time
     const [hours, minutes] = values.datetime.split(':');
     const reminderDate = new Date();
     reminderDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
     const result = await submitReminder({
-      ...values,
+      title: values.title,
       datetime: reminderDate.toISOString(),
+      type: values.type,
+      note: values.note,
       userId: 'user123',
     });
     
     setIsSubmitting(false);
 
-    if (result.success) {
+    if (result.success && result.reminder) {
+      const displayReminder: Reminder = {
+        ...result.reminder,
+        time: new Date(result.reminder.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      onReminderAdded(displayReminder);
       toast({
         title: 'Reminder Set!',
         description: `We'll remind you about "${values.title}".`,
@@ -103,19 +117,42 @@ export function AddReminderDialog() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="datetime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Time</FormLabel>
-                  <FormControl>
-                    <Input type="time" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+                <FormField
+                control={form.control}
+                name="datetime"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Time</FormLabel>
+                    <FormControl>
+                        <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Type</FormLabel>
+                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a type" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="medication">Medication</SelectItem>
+                            <SelectItem value="vaccination">Vaccination</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </div>
             <FormField
               control={form.control}
               name="note"

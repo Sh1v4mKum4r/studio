@@ -45,6 +45,8 @@ export type Reminder = {
   title: string;
   time: string;
   type: 'medication' | 'vaccination';
+  datetime?: string;
+  note?: string | null;
 };
 
 export type ChatMessage = {

@@ -29,6 +29,7 @@ const reminderSchema = z.object({
   datetime: z.string().refine((s) => !Number.isNaN(Date.parse(s)), {
     message: 'datetime must be a valid ISO date string',
   }),
+  type: z.enum(['medication', 'vaccination']),
   note: z.string().max(1000).optional(),
   userId: z.string().min(1).optional(),
 });
@@ -92,7 +93,7 @@ export async function submitAppointment(values: unknown) {
       doctorId: parsed.doctorId,
       date: appointmentDate.toISOString().split('T')[0],
       time: appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      reason: parsed.reason ?? null,
+      reason: parsed.reason ?? 'General Checkup',
       status: 'pending' as const,
       createdAt: new Date().toISOString(),
     };
@@ -138,9 +139,10 @@ export async function submitReminder(values: unknown) {
   try {
     const parsed = reminderSchema.parse(values);
     const reminder = {
-      id: uuidv4(),
+      remId: uuidv4(),
       title: parsed.title,
       datetime: new Date(parsed.datetime).toISOString(),
+      type: parsed.type,
       note: parsed.note ?? null,
       userId: parsed.userId ?? 'user123',
       createdAt: new Date().toISOString(),
