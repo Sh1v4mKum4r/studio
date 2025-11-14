@@ -35,6 +35,7 @@ const prompt = ai.definePrompt({
 
   Here is the user's question: {{{question}}}
   The User ID is: {{{userId}}}`,
+  model: 'googleai/gemini-2.5-flash',
 });
 
 const aiHealthChatbotFlow = ai.defineFlow(
