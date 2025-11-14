@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -9,7 +10,42 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {mockHealthStats, mockUser} from '@/lib/data';
 import {z} from 'genkit';
+
+const HealthStatSchema = z.object({
+  statId: z.string(),
+  userId: z.string(),
+  timestamp: z.string(),
+  bloodPressure: z.object({
+    systolic: z.number(),
+    diastolic: z.number(),
+  }),
+  sugarLevel: z.number(),
+  weight: z.number(),
+  heartRate: z.number(),
+  alertLevel: z.enum(['critical', 'warning', 'normal']).optional(),
+});
+
+const getHealthDataTool = ai.defineTool(
+  {
+    name: 'getUserHealthData',
+    description: "Get the user's latest health data, such as blood pressure, sugar level, weight, and heart rate.",
+    inputSchema: z.object({userId: z.string()}),
+    outputSchema: HealthStatSchema.optional(),
+  },
+  async ({userId}) => {
+    // In a real app, you would fetch this from your database.
+    // For now, we'll use mock data.
+    const userStats = mockHealthStats
+      .filter(stat => stat.userId === userId)
+      .sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+    return userStats[0];
+  }
+);
 
 
 const AiHealthChatbotInputSchema = z.object({
@@ -31,7 +67,10 @@ const prompt = ai.definePrompt({
   name: 'aiHealthChatbotPrompt',
   input: {schema: AiHealthChatbotInputSchema},
   output: {schema: AiHealthChatbotOutputSchema},
+  tools: [getHealthDataTool],
   prompt: `You are a helpful AI assistant for pregnant mothers. Your role is to provide personalized advice based on their questions and health data.
+
+  If the user asks a question about their health data (e.g., blood pressure, weight, sugar levels), use the getUserHealthData tool to retrieve their latest measurements before answering.
 
   Here is the user's question: {{{question}}}
   The User ID is: {{{userId}}}`,
@@ -49,3 +88,4 @@ const aiHealthChatbotFlow = ai.defineFlow(
     return output!;
   }
 );
+
