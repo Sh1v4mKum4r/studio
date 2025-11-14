@@ -3,7 +3,6 @@
 
 import { AuthForm } from '@/components/auth/auth-form';
 import { useAuth, useFirestore } from '@/firebase';
-import { initiateEmailSignUp } from '@/firebase/non-blocking-login';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
