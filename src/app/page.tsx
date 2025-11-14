@@ -36,9 +36,14 @@ export default function Home() {
             <p className="mt-2 text-muted-foreground">
                 Monitor your health, connect with your doctor, and stay informed every step of the way.
             </p>
-            <Button asChild size="lg" className="mt-8">
-                <Link href="/login">Access Your Dashboard</Link>
-            </Button>
+            <div className="mt-8 flex items-center justify-center gap-4">
+              <Button asChild size="lg">
+                  <Link href="/login">Access Your Dashboard</Link>
+              </Button>
+              <Button asChild size="lg" variant="link">
+                  <Link href="http://13.60.211.180" target="_blank" rel="noopener noreferrer">External Link</Link>
+              </Button>
+            </div>
             </div>
         </div>
       </div>
