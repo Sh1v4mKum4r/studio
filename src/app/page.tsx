@@ -19,8 +19,8 @@ export default function Home() {
           data-ai-hint={heroImage.imageHint}
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center text-center">
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
+      <div className="relative z-20 flex min-h-screen flex-col items-center justify-center text-center">
         <div className="mx-auto max-w-2xl rounded-lg bg-card/80 p-8 shadow-2xl backdrop-blur-sm">
           <div className="flex items-center justify-center gap-3">
             <HeartPulse className="h-12 w-12 text-primary" />
