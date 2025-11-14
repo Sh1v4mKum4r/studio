@@ -10,39 +10,37 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full bg-background">
-      <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
-        {/* Left Pane: Image */}
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
+        {/* Left Pane: Image. Hidden on mobile, visible on desktop. */}
         <div className="relative hidden lg:block">
           {heroImage && (
             <Image
               src={heroImage.imageUrl}
               alt={heroImage.description}
               fill
-              className="object-cover object-center"
+              className="object-cover"
               priority
               data-ai-hint={heroImage.imageHint}
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-l from-background/10 via-background/80 to-background" />
+          {/* Gradient overlay for desktop image */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background via-transparent to-transparent" />
         </div>
 
-        {/* Right Pane: Content */}
-        <div className="relative flex items-center justify-center p-4 lg:p-8">
-           {/* Mobile background */}
-          <div className="absolute inset-0 lg:hidden">
-            {heroImage && (
-                <Image
-                src={heroImage.imageUrl}
-                alt={heroImage.description}
-                fill
-                className="object-cover object-center opacity-10"
-                priority
-                data-ai-hint={heroImage.imageHint}
-                />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background" />
-          </div>
-          
+        {/* Right Pane: Content. */}
+        <div
+          className="relative flex items-center justify-center p-8 lg:p-12"
+          // On mobile, apply the image as a background to this pane.
+          style={{
+            backgroundImage: heroImage ? `url(${heroImage.imageUrl})` : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          {/* Semi-transparent overlay for mobile background image */}
+          <div className="absolute inset-0 bg-background/90 lg:hidden" />
+
+          {/* Content Box */}
           <div className="relative z-10 w-full max-w-md text-center">
             <div className="rounded-lg bg-card/80 p-8 shadow-2xl backdrop-blur-sm border border-border/50">
               <div className="flex items-center justify-center gap-3">
@@ -63,8 +61,8 @@ export default function Home() {
                   <Link href="/login">Access Your Dashboard</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
-                  <Link href="http://13.60.211.180" target="_blank" rel="noopener noreferrer">
-                    External Link
+                   <Link href="http://13.60.211.180" target="_blank" rel="noopener noreferrer">
+                    Learn More
                   </Link>
                 </Button>
               </div>
