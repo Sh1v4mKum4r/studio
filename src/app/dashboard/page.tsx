@@ -25,7 +25,7 @@ export default function DashboardPage() {
         <p className="text-sm text-muted-foreground">
             Here&apos;s your health summary as of {format(new Date(latestStat.timestamp), "MMMM d, yyyy")}.
         </p>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={HeartPulse}
           title="Blood Pressure"
