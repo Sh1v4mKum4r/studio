@@ -5,8 +5,6 @@ import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { aiHealthChatbot } from '@/ai/flows/ai-health-chatbot';
 import { analyzeHealthStatsAndGenerateAlerts } from '@/ai/flows/automated-health-alerts';
-import { Timestamp } from 'firebase-admin/firestore';
-import { initializeServerApp } from '@/firebase/server';
 
 // Schemas
 const healthStatSchema = z.object({
@@ -44,22 +42,9 @@ export async function submitHealthStat(values: unknown) {
   try {
     const parsed = healthStatSchema.parse(values);
     console.log('[submitHealthStat] parsed:', parsed);
-
-    const { firestore } = initializeServerApp();
-    const healthStatsCol = firestore.collection(`users/${parsed.userId}/health_stats`);
-
-    const statDoc = {
-      timestamp: Timestamp.now(),
-      bloodPressure: {
-        systolic: parsed.systolic,
-        diastolic: parsed.diastolic,
-      },
-      sugarLevel: parsed.sugarLevel,
-      weight: parsed.weight,
-      heartRate: parsed.heartRate,
-    };
-
-    await healthStatsCol.add(statDoc);
+    
+    // The database write is now handled on the client.
+    // This server action is only for AI analysis.
 
     const result = await analyzeHealthStatsAndGenerateAlerts({
       systolic: parsed.systolic,

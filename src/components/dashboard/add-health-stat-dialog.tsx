@@ -19,7 +19,8 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { submitHealthStat } from '@/app/actions';
 import { Loader2, PlusCircle } from 'lucide-react';
-import { useUser } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 const healthStatSchema = z.object({
   systolic: z.coerce.number().min(50, "Must be > 50").max(300, "Must be < 300"),
@@ -34,6 +35,7 @@ export function AddHealthStatDialog() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user } = useUser();
+  const firestore = useFirestore();
 
   const form = useForm<z.infer<typeof healthStatSchema>>({
     resolver: zodResolver(healthStatSchema),
@@ -56,30 +58,54 @@ export function AddHealthStatDialog() {
         return;
     }
     setIsSubmitting(true);
-    const result = await submitHealthStat({...values, userId: user.uid });
-    setIsSubmitting(false);
+    
+    try {
+        const healthStatsCol = collection(firestore, `users/${user.uid}/health_stats`);
+        const statDoc = {
+            timestamp: serverTimestamp(),
+            bloodPressure: {
+                systolic: values.systolic,
+                diastolic: values.diastolic,
+            },
+            sugarLevel: values.sugarLevel,
+            weight: values.weight,
+            heartRate: values.heartRate,
+        };
+        await addDoc(healthStatsCol, statDoc);
 
-    if (result.success && result.alert) {
-      if(result.alert.shouldSendNotification) {
+        const result = await submitHealthStat({...values, userId: user.uid });
+
+        if (result.success && result.alert) {
+            if(result.alert.shouldSendNotification) {
+                toast({
+                title: `Health Alert: ${result.alert.alertLevel.charAt(0).toUpperCase() + result.alert.alertLevel.slice(1)}`,
+                description: result.alert.alertMessage,
+                variant: result.alert.alertLevel === 'critical' ? 'destructive' : 'default',
+                });
+            } else {
+                toast({
+                title: 'Success',
+                description: 'Your health stats have been recorded.',
+                });
+            }
+            form.reset();
+            setIsOpen(false);
+        } else {
+            toast({
+                title: 'Error analyzing vitals',
+                description: result.message || 'Vitals saved, but analysis failed.',
+                variant: 'destructive',
+            });
+        }
+    } catch (error) {
+        console.error("Error submitting health stats:", error);
         toast({
-          title: `Health Alert: ${result.alert.alertLevel.charAt(0).toUpperCase() + result.alert.alertLevel.slice(1)}`,
-          description: result.alert.alertMessage,
-          variant: result.alert.alertLevel === 'critical' ? 'destructive' : 'default',
+            title: 'Error submitting vitals',
+            description: 'Could not save your health stats. Please try again.',
+            variant: 'destructive',
         });
-      } else {
-        toast({
-          title: 'Success',
-          description: 'Your health stats have been recorded.',
-        });
-      }
-      form.reset();
-      setIsOpen(false);
-    } else {
-      toast({
-        title: 'Error submitting vitals',
-        description: result.message || 'An unknown error occurred.',
-        variant: 'destructive',
-      });
+    } finally {
+        setIsSubmitting(false);
     }
   }
 
