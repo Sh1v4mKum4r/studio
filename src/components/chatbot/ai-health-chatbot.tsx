@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect, useTransition } from 'react';
@@ -127,7 +128,7 @@ export function AIHealthChatbot({ user }: AIHealthChatbotProps) {
             placeholder="Ask a question... (Shift+Enter for new line)"
             disabled={isPending}
             rows={1}
-            className="min-h-[48px] max-h-48 resize-y"
+            className="flex-1 min-h-[48px] max-h-48 resize-y"
           />
           <Button type="submit" size="icon" disabled={isPending || !inputValue.trim()}>
             <Send className="h-4 w-4" />
