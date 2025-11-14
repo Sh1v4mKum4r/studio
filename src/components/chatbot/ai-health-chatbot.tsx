@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -52,10 +52,17 @@ export function AIHealthChatbot({ user }: AIHealthChatbotProps) {
       const assistantMessage: ChatMessage = {
         id: Date.now().toString() + 'ai',
         role: 'assistant',
-        content: response.answer,
+        content: response.answer || "Sorry, I couldn't get a response. Please try again.",
       };
       setMessages((prev) => [...prev, assistantMessage]);
     });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
+    }
   };
 
   return (
@@ -83,7 +90,7 @@ export function AIHealthChatbot({ user }: AIHealthChatbotProps) {
                       : 'bg-muted'
                   }`}
                 >
-                  <p>{message.content}</p>
+                  <p className="whitespace-pre-wrap">{message.content}</p>
                 </div>
                  {message.role === 'user' && (
                   <Avatar className="h-8 w-8">
@@ -113,11 +120,14 @@ export function AIHealthChatbot({ user }: AIHealthChatbotProps) {
       </CardContent>
       <CardFooter className="border-t pt-6">
         <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
-          <Input
+          <Textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Ask a question..."
+            onKeyDown={handleKeyDown}
+            placeholder="Ask a question... (Shift+Enter for new line)"
             disabled={isPending}
+            rows={1}
+            className="min-h-[48px] max-h-48 resize-y"
           />
           <Button type="submit" size="icon" disabled={isPending || !inputValue.trim()}>
             <Send className="h-4 w-4" />
