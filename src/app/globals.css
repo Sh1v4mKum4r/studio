@@ -1,10 +1,7 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-body {
-  font-family: var(--font-body), sans-serif;
-}
 
 @layer base {
   :root {
