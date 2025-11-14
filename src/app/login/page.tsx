@@ -3,17 +3,19 @@
 
 import { AuthForm } from '@/components/auth/auth-form';
 import { useAuth } from '@/firebase';
-import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { HeartPulse } from 'lucide-react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import type { FirebaseError } from 'firebase/app';
 
 export default function LoginPage() {
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && !isUserLoading) {
@@ -22,11 +24,18 @@ export default function LoginPage() {
   }, [user, isUserLoading, router]);
 
   const handleLogin = async ({ email, password }: any) => {
+    setError(null);
     try {
-      initiateEmailSignIn(auth, email, password);
-    } catch (error) {
-      console.error('Login failed:', error);
-      // The useUser hook will handle displaying the error in a toast
+      await signInWithEmailAndPassword(auth, email, password);
+      // The useEffect will handle redirection on successful login
+    } catch (err: unknown) {
+      const error = err as FirebaseError;
+      console.error('Login failed:', error.code, error.message);
+      if (error.code === 'auth/invalid-credential') {
+        setError('Invalid login credentials. Please try again.');
+      } else {
+        setError('An unexpected error occurred. Please try again later.');
+      }
     }
   };
 
@@ -47,7 +56,7 @@ export default function LoginPage() {
             </h1>
         </div>
       <div className="w-full max-w-sm">
-        <AuthForm mode="login" onSubmit={handleLogin} />
+        <AuthForm mode="login" onSubmit={handleLogin} error={error} />
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
           <Link href="/signup" className="font-medium text-primary hover:underline">

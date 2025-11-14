@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldX } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -22,9 +23,10 @@ const signupSchema = loginSchema.extend({
 type AuthFormProps = {
   mode: 'login' | 'signup';
   onSubmit: (values: any) => Promise<void>;
+  error?: string | null;
 };
 
-export function AuthForm({ mode, onSubmit }: AuthFormProps) {
+export function AuthForm({ mode, onSubmit, error }: AuthFormProps) {
   const schema = mode === 'login' ? loginSchema : signupSchema;
 
   const form = useForm<z.infer<typeof schema>>({
@@ -50,6 +52,13 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+             {error && (
+              <Alert variant="destructive">
+                <ShieldX className="h-4 w-4" />
+                <AlertTitle>Login Failed</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             {mode === 'signup' && (
               <FormField
                 control={form.control}
