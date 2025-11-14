@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -40,6 +41,7 @@ const prompt = ai.definePrompt({
   name: 'healthStatsAlertPrompt',
   input: {schema: HealthStatsInputSchema},
   output: {schema: HealthAlertOutputSchema},
+  model: 'googleai/gemini-2.5-flash',
   prompt: `You are a healthcare assistant that helps analyze patient health data and generate alerts.
 
   Based on the provided health stats, determine the alert level and generate a message.
@@ -81,3 +83,4 @@ const analyzeHealthStatsAndGenerateAlertsFlow = ai.defineFlow(
     return output!;
   }
 );
+
