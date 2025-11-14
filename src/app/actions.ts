@@ -111,7 +111,7 @@ export async function submitSOS(values: unknown) {
     console.log('[submitSOS] parsed for server action:', parsed);
     // TODO: notify emergency contacts
     return { success: true };
-  } catch (err)_ {
+  } catch (err) {
     console.error('[submitSOS] error:', err);
     if (err instanceof z.ZodError) return { success: false, errorType: 'validation', issues: err.errors };
     return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
