@@ -21,7 +21,7 @@ export default function DashboardPage() {
        <h1 className="text-2xl font-semibold md:hidden">
             Welcome back!
         </h1>
-        <p className="text-sm text-muted-foreground whitespace-nowrap">
+        <p className="whitespace-nowrap text-sm text-muted-foreground">
             Here&apos;s your health summary as of {format(new Date(latestStat.timestamp), "MMMM d, yyyy")}.
         </p>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -50,8 +50,8 @@ const prompt = ai.definePrompt({
   - Timestamp: {{{timestamp}}}
 
   Alert Criteria:
-  - Critical: Systolic BP ≥ 160 or Diastolic BP ≥ 100 or Sugar ≥ 250
-  - Warning: Systolic BP ≥ 140 or Diastolic BP ≥ 90 or Sugar ≥ 180
+  - Critical: Systolic BP >= 160 or Diastolic BP >= 100 or Sugar >= 250
+  - Warning: Systolic BP >= 140 or Diastolic BP >= 90 or Sugar >= 180
   - Normal: Otherwise
 
   Include the user's name ({{{userName}}}) and the doctor's name ({{{doctorName}}}) in the message.

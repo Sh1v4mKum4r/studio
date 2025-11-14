@@ -67,12 +67,12 @@ export function AIHealthChatbot({ user }: AIHealthChatbotProps) {
   };
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="flex h-full flex-col">
       <CardHeader className="border-b">
         <CardTitle>AI Health Chatbot</CardTitle>
         <CardDescription>Your personal AI assistant for pregnancy-related questions.</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 p-0 overflow-hidden">
+      <CardContent className="flex-1 overflow-hidden p-0">
         <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
           <div className="space-y-6">
             {messages.map((message) => (
