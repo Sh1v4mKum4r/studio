@@ -30,7 +30,6 @@ export default function LoginPage() {
       // The useEffect will handle redirection on successful login
     } catch (err: unknown) {
       const error = err as FirebaseError;
-      console.error('Login failed:', error.code, error.message);
       if (error.code === 'auth/invalid-credential') {
         setError('Invalid login credentials. Please try again.');
       } else {
