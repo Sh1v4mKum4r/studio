@@ -1,0 +1,391 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user in the system, either a pregnant mother/patient or a doctor.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user entity."
+        },
+        "userType": {
+          "type": "string",
+          "description": "The type of user (e.g., 'patient', 'doctor')."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "User's full name."
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "User's phone number."
+        },
+        "address": {
+          "type": "string",
+          "description": "User's address."
+        },
+        "emergencyContactIds": {
+          "type": "array",
+          "description": "References to emergency contacts. (Relationship: User 1:N EmergencyContact)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fcmTokens": {
+          "type": "array",
+          "description": "Array of Firebase Cloud Messaging tokens for the user.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userType",
+        "email",
+        "name"
+      ]
+    },
+    "Doctor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Doctor",
+      "type": "object",
+      "description": "Represents a doctor with special permissions.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the doctor entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: Doctor 1:1 User)"
+        },
+        "speciality": {
+          "type": "string",
+          "description": "Doctor's medical specialization."
+        },
+        "clinicAddress": {
+          "type": "string",
+          "description": "Address of the doctor's clinic."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "speciality"
+      ]
+    },
+    "HealthStat": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HealthStat",
+      "type": "object",
+      "description": "Represents a health stat entry for a patient.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the health stat entry."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N HealthStat)"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the health stat was recorded.",
+          "format": "date-time"
+        },
+        "bloodPressureSystolic": {
+          "type": "number",
+          "description": "Systolic blood pressure reading."
+        },
+        "bloodPressureDiastolic": {
+          "type": "number",
+          "description": "Diastolic blood pressure reading."
+        },
+        "sugarLevel": {
+          "type": "number",
+          "description": "Blood sugar level reading."
+        },
+        "weight": {
+          "type": "number",
+          "description": "Patient's weight."
+        },
+        "alert": {
+          "type": "string",
+          "description": "Alert level for the health stat (e.g., 'normal', 'warning', 'critical')."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "timestamp"
+      ]
+    },
+    "Appointment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Appointment",
+      "type": "object",
+      "description": "Represents an appointment between a patient and a doctor.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the appointment."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to User (patient). (Relationship: User 1:N Appointment)"
+        },
+        "doctorId": {
+          "type": "string",
+          "description": "Reference to Doctor. (Relationship: Doctor 1:N Appointment)"
+        },
+        "appointmentDateTime": {
+          "type": "string",
+          "description": "Date and time of the appointment.",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Notes about the appointment."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "doctorId",
+        "appointmentDateTime"
+      ]
+    },
+    "Reminder": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Reminder",
+      "type": "object",
+      "description": "Represents a reminder for medication or vaccination.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the reminder."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Reminder)"
+        },
+        "reminderType": {
+          "type": "string",
+          "description": "Type of reminder (e.g., 'medication', 'vaccination')."
+        },
+        "reminderDateTime": {
+          "type": "string",
+          "description": "Date and time of the reminder.",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "description": "Reminder message."
+        },
+        "isCompleted": {
+          "type": "boolean",
+          "description": "Indicates if the reminder has been completed."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "reminderType",
+        "reminderDateTime",
+        "message"
+      ]
+    },
+    "SosEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SosEvent",
+      "type": "object",
+      "description": "Represents an SOS emergency event.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SOS event."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N SosEvent)"
+        },
+        "eventDateTime": {
+          "type": "string",
+          "description": "Date and time of the SOS event.",
+          "format": "date-time"
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the user during the SOS event (e.g., coordinates)."
+        },
+        "message": {
+          "type": "string",
+          "description": "Additional message or information about the SOS event."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "eventDateTime",
+        "location"
+      ]
+    },
+    "EmergencyContact": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "EmergencyContact",
+      "type": "object",
+      "description": "Represents an emergency contact for a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the emergency contact."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the emergency contact."
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "Phone number of the emergency contact."
+        },
+        "relationship": {
+          "type": "string",
+          "description": "Relationship to the user (e.g., 'spouse', 'parent', 'friend')."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "phoneNumber",
+        "relationship"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles.  Path-based ownership for user-specific data (health stats, reminders, SOS events) is enforced via subcollections.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/health_stats/{statId}",
+        "definition": {
+          "entityName": "HealthStat",
+          "schema": {
+            "$ref": "#/backend/entities/HealthStat"
+          },
+          "description": "Stores health statistics for a user. Subcollection of `/users/{userId}` for ownership and simplified security rules.  No denormalized authorization data is needed because ownership is directly implied by the path.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "statId",
+              "description": "The unique identifier for the health stat entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/reminders/{reminderId}",
+        "definition": {
+          "entityName": "Reminder",
+          "schema": {
+            "$ref": "#/backend/entities/Reminder"
+          },
+          "description": "Stores reminders for a user. Subcollection of `/users/{userId}` for ownership and simplified security rules.  No denormalized authorization data is needed because ownership is directly implied by the path.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "reminderId",
+              "description": "The unique identifier for the reminder."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/sos_events/{eventId}",
+        "definition": {
+          "entityName": "SosEvent",
+          "schema": {
+            "$ref": "#/backend/entities/SosEvent"
+          },
+          "description": "Stores SOS events for a user. Subcollection of `/users/{userId}` for ownership and simplified security rules. No denormalized authorization data is needed because ownership is directly implied by the path.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "eventId",
+              "description": "The unique identifier for the SOS event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/doctors/{doctorId}",
+        "definition": {
+          "entityName": "Doctor",
+          "schema": {
+            "$ref": "#/backend/entities/Doctor"
+          },
+          "description": "Stores doctor profiles.",
+          "params": [
+            {
+              "name": "doctorId",
+              "description": "The unique identifier for the doctor."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/appointments/{appointmentId}",
+        "definition": {
+          "entityName": "Appointment",
+          "schema": {
+            "$ref": "#/backend/entities/Appointment"
+          },
+          "description": "Stores appointment information.  Accessible to both patients and doctors involved. Requires security rules to validate that either request.auth.uid matches patientId or is a doctor (via custom claim).",
+          "params": [
+            {
+              "name": "appointmentId",
+              "description": "The unique identifier for the appointment."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to balance data access needs with security and scalability, adhering to the principles of Authorization Independence, Clarity of Intent, and DBAC. User-owned data like HealthStats, Reminders, and SOS events are stored in subcollections under the `/users/{userId}` path to enforce clear ownership and simplify security rules. This approach eliminates the need for complex `get()` calls in security rules, achieving Authorization Independence.\n\nCollaborative access to data, such as appointments, utilizes a top-level collection `/appointments`, facilitating easier querying across all appointments. Doctor specific information is stored in `/doctors/{doctorId}` with a 1:1 relation to the User.\n\nThe `QAPs` are supported by segregating data based on ownership and by using top-level collections when cross-user querying is needed. For instance, listing all appointments can be done efficiently on the `/appointments` collection.\n\nSpecifically, authorization independence is achieved through path-based ownership in the `/users/{userId}` subcollections (HealthStats, Reminders, SosEvents). No `get()` calls are needed to verify ownership as the path itself enforces it. The security rules can directly use `request.auth.uid == userId` without retrieving parent documents.  \n\nFor the appointments collection, authorization is tied to both the patientId and doctorId, allowing for list operations restricted to a specific user or doctor."
+  }
+}
