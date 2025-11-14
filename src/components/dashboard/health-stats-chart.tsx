@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,12 +41,12 @@ export function HealthStatsChart({ stats }: HealthStatsChartProps) {
   }));
 
   return (
-    <Card className="col-span-1 lg:col-span-2 xl:col-span-3">
+    <Card className="lg:col-span-2">
       <CardHeader>
         <CardTitle>Health Trends</CardTitle>
         <CardDescription>Your health statistics over the last 15 days.</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-6 pl-2 sm:grid-cols-2">
+      <CardContent className="grid gap-6 sm:grid-cols-2 pl-2">
         <div>
           <h3 className="mb-2 text-sm font-medium text-center">Blood Pressure</h3>
           <ChartContainer config={chartConfig} className="h-[250px] w-full">

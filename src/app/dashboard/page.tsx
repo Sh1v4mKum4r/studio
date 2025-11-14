@@ -1,3 +1,4 @@
+
 import { StatCard } from "@/components/dashboard/stat-card";
 import { HealthStatsChart } from "@/components/dashboard/health-stats-chart";
 import { UpcomingAppointments } from "@/components/dashboard/upcoming-appointments";
@@ -21,7 +22,7 @@ export default function DashboardPage() {
        <h1 className="text-2xl font-semibold md:hidden">
             Welcome back!
         </h1>
-        <p className="whitespace-nowrap text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
             Here&apos;s your health summary as of {format(new Date(latestStat.timestamp), "MMMM d, yyyy")}.
         </p>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -52,10 +53,12 @@ export default function DashboardPage() {
           description="At rest"
         />
       </div>
-      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <HealthStatsChart stats={healthStats} />
-        <UpcomingAppointments appointments={appointments} doctors={doctors} />
-        <RemindersList reminders={reminders} />
+        <div className="lg:col-span-1 flex flex-col gap-6">
+            <UpcomingAppointments appointments={appointments} doctors={doctors} />
+            <RemindersList reminders={reminders} />
+        </div>
       </div>
     </div>
   );
