@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { doc } from 'firebase/firestore';
 import Link from 'next/link';
 import { HeartPulse } from 'lucide-react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 export default function SignupPage() {
   const auth = useAuth();
@@ -25,7 +26,7 @@ export default function SignupPage() {
 
   const handleSignup = async ({ email, password, name }: any) => {
     try {
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
       if (newUser) {
         const userProfileRef = doc(firestore, 'users', newUser.uid);
