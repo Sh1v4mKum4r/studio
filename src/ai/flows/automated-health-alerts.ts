@@ -64,7 +64,7 @@ const prompt = ai.definePrompt({
   Example:
   {
     "alertLevel": "warning",
-    "alertMessage": "Warning: Blood pressure is elevated ({{{systolic}}}/{{{diastolic}}} mmHg). Please rest and monitor. Contact your doctor if it remains high. Doctor {{{doctorName}}} has been notified.",
+    "alertMessage": "Warning: Blood pressure is elevated (145/92 mmHg). Please rest and monitor. Contact your doctor if it remains high. Doctor Dr. Carter has been notified.",
     "shouldSendNotification": true
   }
   `,
