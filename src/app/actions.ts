@@ -12,7 +12,7 @@ const healthStatSchema = z.object({
   heartRate: z.coerce.number().min(30).max(250),
 });
 
-export async function submitHealthStat(values: z.infer<typeof healthStatSchema>) {
+export async function submitHealthStat(values: unknown) {
   // In a real app, you would get user/doctor info from the session
   const dummyData = {
     userId: 'user123',
@@ -22,10 +22,15 @@ export async function submitHealthStat(values: z.infer<typeof healthStatSchema>)
   };
 
   try {
+    // Validate and coerce incoming values
+    const parsed = healthStatSchema.parse(values);
+
     const result = await analyzeHealthStatsAndGenerateAlerts({
-      systolic: values.systolic,
-      diastolic: values.diastolic,
-      sugarLevel: values.sugarLevel,
+      systolic: parsed.systolic,
+      diastolic: parsed.diastolic,
+      sugarLevel: parsed.sugarLevel,
+      weight: parsed.weight,
+      heartRate: parsed.heartRate,
       timestamp: new Date().toISOString(),
       ...dummyData,
     });
@@ -40,12 +45,17 @@ export async function submitHealthStat(values: z.infer<typeof healthStatSchema>)
 }
 
 export async function getChatbotResponse(userId: string, question: string) {
-    if(!question) {
+    const trimmed = question?.trim();
+    if (!trimmed) {
         return { answer: "Please provide a question." };
+    }
+
+    if (!userId || !userId.trim()) {
+        return { answer: "Invalid user ID." };
     }
     
     try {
-        const response = await aiHealthChatbot({ userId, question });
+        const response = await aiHealthChatbot({ userId: userId.trim(), question: trimmed });
         return response;
     } catch (error) {
         console.error('Error getting chatbot response:', error);
