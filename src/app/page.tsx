@@ -9,7 +9,7 @@ export default function Home() {
   const heroImage = PlaceHolderImages.find((img) => img.id === 'landing-hero');
 
   return (
-    <div className="flex min-h-screen w-full flex-col lg:flex-row">
+    <div className="flex min-h-screen w-full flex-col lg:flex-row bg-background">
       <div className="relative flex flex-1 flex-col items-center justify-center p-4 lg:p-8">
         <div className="absolute inset-0 lg:hidden">
             {heroImage && (
@@ -17,22 +17,22 @@ export default function Home() {
                 src={heroImage.imageUrl}
                 alt={heroImage.description}
                 fill
-                className="object-cover object-center"
+                className="object-cover object-center opacity-20"
                 priority
                 data-ai-hint={heroImage.imageHint}
                 />
             )}
-             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
+             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background" />
         </div>
          <div className="relative z-10 w-full max-w-md text-center">
-           <div className="rounded-lg bg-card/80 p-8 shadow-2xl backdrop-blur-sm">
+           <div className="rounded-lg bg-card/80 p-8 shadow-2xl backdrop-blur-sm border border-border">
             <div className="flex items-center justify-center gap-3">
               <HeartPulse className="h-12 w-12 text-primary" />
               <h1 className="font-headline text-5xl font-bold text-primary">
                 VitalSync
               </h1>
             </div>
-            <p className="mt-4 text-lg text-muted-foreground">
+            <p className="mt-4 text-lg text-foreground">
               Your partner in a healthy pregnancy journey.
             </p>
             <p className="mt-2 text-muted-foreground">
@@ -58,11 +58,12 @@ export default function Home() {
             src={heroImage.imageUrl}
             alt={heroImage.description}
             fill
-            className="object-cover object-center"
+            className="object-cover object-center opacity-30"
             priority
             data-ai-hint={heroImage.imageHint}
           />
         )}
+        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-background/50 to-background" />
       </div>
     </div>
   );
