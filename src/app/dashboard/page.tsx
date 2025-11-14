@@ -25,7 +25,7 @@ export default function DashboardPage() {
         <p className="text-sm text-muted-foreground">
             Here&apos;s your health summary as of {format(new Date(latestStat.timestamp), "MMMM d, yyyy")}.
         </p>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={HeartPulse}
           title="Blood Pressure"
@@ -53,12 +53,10 @@ export default function DashboardPage() {
           description="At rest"
         />
       </div>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         <HealthStatsChart stats={healthStats} />
-        <div className="lg:col-span-1 flex flex-col gap-6">
-            <UpcomingAppointments appointments={appointments} doctors={doctors} />
-            <RemindersList reminders={reminders} />
-        </div>
+        <UpcomingAppointments appointments={appointments} doctors={doctors} />
+        <RemindersList reminders={reminders} />
       </div>
     </div>
   );

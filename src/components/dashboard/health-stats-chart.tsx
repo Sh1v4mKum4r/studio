@@ -41,7 +41,7 @@ export function HealthStatsChart({ stats }: HealthStatsChartProps) {
   }));
 
   return (
-    <Card className="lg:col-span-2">
+    <Card className="lg:col-span-3">
       <CardHeader>
         <CardTitle>Health Trends</CardTitle>
         <CardDescription>Your health statistics over the last 15 days.</CardDescription>
