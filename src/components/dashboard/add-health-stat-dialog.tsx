@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { submitHealthStat } from '@/app/actions';
 import { Loader2, PlusCircle } from 'lucide-react';
+import { useUser } from '@/firebase';
 
 const healthStatSchema = z.object({
   systolic: z.coerce.number().min(50, "Must be > 50").max(300, "Must be < 300"),
@@ -32,6 +33,7 @@ export function AddHealthStatDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useUser();
 
   const form = useForm<z.infer<typeof healthStatSchema>>({
     resolver: zodResolver(healthStatSchema),
@@ -45,8 +47,16 @@ export function AddHealthStatDialog() {
   });
 
   async function onSubmit(values: z.infer<typeof healthStatSchema>) {
+    if (!user) {
+        toast({
+            title: 'Authentication Error',
+            description: 'You must be logged in to submit health stats.',
+            variant: 'destructive',
+        });
+        return;
+    }
     setIsSubmitting(true);
-    const result = await submitHealthStat(values);
+    const result = await submitHealthStat({...values, userId: user.uid });
     setIsSubmitting(false);
 
     if (result.success && result.alert) {

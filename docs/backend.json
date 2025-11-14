@@ -101,13 +101,17 @@
           "description": "Timestamp of when the health stat was recorded.",
           "format": "date-time"
         },
-        "bloodPressureSystolic": {
-          "type": "number",
-          "description": "Systolic blood pressure reading."
-        },
-        "bloodPressureDiastolic": {
-          "type": "number",
-          "description": "Diastolic blood pressure reading."
+        "bloodPressure": {
+          "type": "object",
+          "description": "Blood pressure reading.",
+          "properties": {
+            "systolic": {
+              "type": "number"
+            },
+            "diastolic": {
+              "type": "number"
+            }
+          }
         },
         "sugarLevel": {
           "type": "number",
@@ -116,6 +120,10 @@
         "weight": {
           "type": "number",
           "description": "Patient's weight."
+        },
+        "heartRate": {
+          "type": "number",
+          "description": "Patient's heart rate in beats per minute."
         },
         "alert": {
           "type": "string",

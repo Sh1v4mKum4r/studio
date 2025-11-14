@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { aiHealthChatbot } from '@/ai/flows/ai-health-chatbot';
 import { analyzeHealthStatsAndGenerateAlerts } from '@/ai/flows/automated-health-alerts';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { initializeFirebase } from '@/firebase';
 
 // Schemas
 const healthStatSchema = z.object({
@@ -12,6 +14,7 @@ const healthStatSchema = z.object({
   sugarLevel: z.coerce.number().min(30).max(500),
   weight: z.coerce.number().min(20).max(300),
   heartRate: z.coerce.number().min(30).max(250),
+  userId: z.string().min(1),
 });
 
 const appointmentSchema = z.object({
@@ -42,13 +45,29 @@ export async function submitHealthStat(values: unknown) {
     const parsed = healthStatSchema.parse(values);
     console.log('[submitHealthStat] parsed:', parsed);
 
+    const { firestore } = initializeFirebase();
+    const healthStatsCol = collection(firestore, `users/${parsed.userId}/health_stats`);
+
+    const statDoc = {
+      timestamp: serverTimestamp(),
+      bloodPressure: {
+        systolic: parsed.systolic,
+        diastolic: parsed.diastolic,
+      },
+      sugarLevel: parsed.sugarLevel,
+      weight: parsed.weight,
+      heartRate: parsed.heartRate,
+    };
+
+    addDoc(healthStatsCol, statDoc).catch((e) => console.error(e));
+
     const result = await analyzeHealthStatsAndGenerateAlerts({
       systolic: parsed.systolic,
       diastolic: parsed.diastolic,
       sugarLevel: parsed.sugarLevel,
       timestamp: new Date().toISOString(),
       // Replace with real session/user data where appropriate
-      userId: 'user123',
+      userId: parsed.userId,
       userName: 'Jane Doe',
       doctorId: 'doc456',
       doctorName: 'Dr. Carter',
@@ -59,7 +78,7 @@ export async function submitHealthStat(values: unknown) {
   } catch (err) {
     console.error('[submitHealthStat] error:', err);
     if (err instanceof z.ZodError) {
-      return { success: false, errorType: 'validation', issues: err.errors };
+      return { success: false, errorType: 'validation', issues: err.errors, message: err.message };
     }
     return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
   }
