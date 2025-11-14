@@ -25,6 +25,9 @@ export async function submitHealthStat(values: unknown) {
     // Validate and coerce incoming values
     const parsed = healthStatSchema.parse(values);
 
+    // debug: show parsed values in server logs
+    console.log('submitHealthStat parsed values:', parsed);
+
     const result = await analyzeHealthStatsAndGenerateAlerts({
       systolic: parsed.systolic,
       diastolic: parsed.diastolic,
@@ -40,7 +43,7 @@ export async function submitHealthStat(values: unknown) {
     return { success: true, alert: result };
   } catch (error) {
     console.error('Error analyzing health stats:', error);
-    return { success: false, error: 'Failed to analyze health stats.' };
+    return { success: false, error: (error as Error)?.message ?? String(error) };
   }
 }
 
