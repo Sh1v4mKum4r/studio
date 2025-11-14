@@ -66,8 +66,8 @@ export function AddHealthStatDialog() {
       setIsOpen(false);
     } else {
       toast({
-        title: 'Error',
-        description: result.error || 'Something went wrong.',
+        title: 'Error submitting vitals',
+        description: result.message || 'An unknown error occurred.',
         variant: 'destructive',
       });
     }
