@@ -10,22 +10,40 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row bg-background">
+      {/* Left Pane: Image */}
+      <div className="relative hidden flex-1 lg:block">
+        {heroImage && (
+          <Image
+            src={heroImage.imageUrl}
+            alt={heroImage.description}
+            fill
+            className="object-cover object-center"
+            priority
+            data-ai-hint={heroImage.imageHint}
+          />
+        )}
+         <div className="absolute inset-0 bg-gradient-to-l from-background/10 via-background/80 to-background" />
+      </div>
+
+      {/* Right Pane: Content */}
       <div className="relative flex flex-1 flex-col items-center justify-center p-4 lg:p-8">
+        {/* Mobile background */}
         <div className="absolute inset-0 lg:hidden">
-            {heroImage && (
-                <Image
-                src={heroImage.imageUrl}
-                alt={heroImage.description}
-                fill
-                className="object-cover object-center opacity-20"
-                priority
-                data-ai-hint={heroImage.imageHint}
-                />
-            )}
-             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background" />
+           {heroImage && (
+              <Image
+              src={heroImage.imageUrl}
+              alt={heroImage.description}
+              fill
+              className="object-cover object-center opacity-10"
+              priority
+              data-ai-hint={heroImage.imageHint}
+              />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background" />
         </div>
-         <div className="relative z-10 w-full max-w-md text-center">
-           <div className="rounded-lg bg-card/80 p-8 shadow-2xl backdrop-blur-sm border border-border">
+
+        <div className="relative z-10 w-full max-w-md text-center">
+          <div className="rounded-lg bg-card/80 p-8 shadow-2xl backdrop-blur-sm border border-border/50">
             <div className="flex items-center justify-center gap-3">
               <HeartPulse className="h-12 w-12 text-primary" />
               <h1 className="font-headline text-5xl font-bold text-primary">
@@ -51,19 +69,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
-      <div className="relative hidden flex-1 lg:block">
-        {heroImage && (
-          <Image
-            src={heroImage.imageUrl}
-            alt={heroImage.description}
-            fill
-            className="object-cover object-center opacity-30"
-            priority
-            data-ai-hint={heroImage.imageHint}
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-background/50 to-background" />
       </div>
     </div>
   );
