@@ -1,3 +1,4 @@
+
 'use client';
 
 import { AppointmentScheduler } from "@/components/appointments/appointment-scheduler";
@@ -10,7 +11,6 @@ export default function AppointmentsPage() {
     const { user } = useUser();
     const firestore = useFirestore();
 
-    // Memoize the query to prevent re-renders
     const appointmentsQuery = useMemoFirebase(() => {
         if (!user || !firestore) return null;
         return query(collection(firestore, 'appointments'), where('patientId', '==', user.uid));
@@ -22,12 +22,13 @@ export default function AppointmentsPage() {
         return <div>Loading appointments...</div>;
     }
 
-    // In a real app, you would fetch this data
     const doctors = mockDoctors;
 
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-6">Manage Appointments</h1>
+        <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold">Manage Appointments</h1>
+            </div>
             <AppointmentScheduler appointments={appointments || []} doctors={doctors} />
         </div>
     );

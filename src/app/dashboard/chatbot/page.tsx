@@ -11,7 +11,7 @@ export default function ChatbotPage() {
     }
 
     return (
-        <div className="h-full">
+        <div className="h-[calc(100vh-theme(spacing.24))]">
             <AIHealthChatbot user={user} />
         </div>
     );

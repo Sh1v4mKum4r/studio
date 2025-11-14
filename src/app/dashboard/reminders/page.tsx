@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -30,14 +31,13 @@ export default function RemindersPage() {
   const handleDeleteReminder = () => {
     if (reminderToDelete) {
       setReminders((prev) => prev.filter((r) => r.remId !== reminderToDelete.remId));
-      // In a real app, you would also call a server action to delete from the DB
       setReminderToDelete(null);
     }
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
+    <div className="flex flex-col gap-6">
+      <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Your Reminders</h1>
         <AddReminderDialog onReminderAdded={handleReminderAdded} />
       </div>
@@ -47,7 +47,7 @@ export default function RemindersPage() {
           <CardDescription>A list of your medication and vaccination reminders.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {reminders.map((reminder) => (
               <div key={reminder.remId} className="relative flex items-center space-x-4 rounded-lg border p-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/50">
