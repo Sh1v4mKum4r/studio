@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Appointment, Doctor } from "@/lib/types";
@@ -18,7 +19,7 @@ export function UpcomingAppointments({ appointments, doctors }: UpcomingAppointm
   const getDoctor = (doctorId: string) => doctors.find(d => d.doctorId === doctorId);
 
   return (
-    <Card className="col-span-1 xl:col-span-1">
+    <Card className="lg:col-span-2">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CalendarDays className="h-5 w-5"/>

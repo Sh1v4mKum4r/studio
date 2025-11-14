@@ -46,7 +46,7 @@ export function HealthStatsChart({ stats }: HealthStatsChartProps) {
         <CardTitle>Health Trends</CardTitle>
         <CardDescription>Your health statistics over the last 15 days.</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-6 sm:grid-cols-2 pl-2">
+      <CardContent className="grid gap-6 md:grid-cols-2 pl-2">
         <div>
           <h3 className="mb-2 text-sm font-medium text-center">Blood Pressure</h3>
           <ChartContainer config={chartConfig} className="h-[250px] w-full">

@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bell, Pill, Syringe } from "lucide-react";
 import type { Reminder } from "@/lib/types";
@@ -8,7 +9,7 @@ type RemindersListProps = {
 
 export function RemindersList({ reminders }: RemindersListProps) {
   return (
-    <Card className="col-span-1 xl:col-span-1">
+    <Card className="lg:col-span-2">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
