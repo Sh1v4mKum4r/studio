@@ -1,11 +1,11 @@
+
 'use server';
 
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { aiHealthChatbot } from '@/ai/flows/ai-health-chatbot';
 import { analyzeHealthStatsAndGenerateAlerts } from '@/ai/flows/automated-health-alerts';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { getFirestore } from 'firebase-admin/firestore';
+import { Timestamp } from 'firebase-admin/firestore';
 import { initializeServerApp } from '@/firebase/server';
 
 // Schemas
@@ -33,7 +33,6 @@ const reminderSchema = z.object({
   datetime: z.string().refine((s) => !Number.isNaN(Date.parse(s)), {
     message: 'datetime must be a valid ISO date string',
   }),
-  type: z.enum(['medication', 'vaccination']),
   note: z.string().max(1000).optional(),
   userId: z.string().min(1).optional(),
 });
@@ -47,10 +46,10 @@ export async function submitHealthStat(values: unknown) {
     console.log('[submitHealthStat] parsed:', parsed);
 
     const { firestore } = initializeServerApp();
-    const healthStatsCol = collection(firestore, `users/${parsed.userId}/health_stats`);
+    const healthStatsCol = firestore.collection(`users/${parsed.userId}/health_stats`);
 
     const statDoc = {
-      timestamp: serverTimestamp(),
+      timestamp: Timestamp.now(),
       bloodPressure: {
         systolic: parsed.systolic,
         diastolic: parsed.diastolic,
@@ -60,7 +59,7 @@ export async function submitHealthStat(values: unknown) {
       heartRate: parsed.heartRate,
     };
 
-    await addDoc(healthStatsCol, statDoc);
+    await healthStatsCol.add(statDoc);
 
     const result = await analyzeHealthStatsAndGenerateAlerts({
       systolic: parsed.systolic,
@@ -162,7 +161,6 @@ export async function submitReminder(values: unknown) {
       remId: uuidv4(),
       title: parsed.title,
       datetime: new Date(parsed.datetime).toISOString(),
-      type: parsed.type,
       note: parsed.note ?? null,
       userId: parsed.userId ?? 'user123',
       createdAt: new Date().toISOString(),
