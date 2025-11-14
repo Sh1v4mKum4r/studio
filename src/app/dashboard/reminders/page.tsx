@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
+import { AddReminderDialog } from "@/components/dashboard/add-reminder-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockReminders } from "@/lib/data";
-import { Bell, Pill, Plus, Syringe } from "lucide-react";
+import { Pill, Syringe } from "lucide-react";
 
 export default function RemindersPage() {
     const reminders = mockReminders;
@@ -10,10 +10,7 @@ export default function RemindersPage() {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold">Your Reminders</h1>
-                <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Reminder
-                </Button>
+                <AddReminderDialog />
             </div>
             <Card>
                 <CardHeader>

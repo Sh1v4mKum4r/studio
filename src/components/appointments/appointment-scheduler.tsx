@@ -6,6 +6,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Appointment, Doctor } from '@/lib/types';
 import { format, isSameDay, isAfter, startOfToday } from 'date-fns';
+import { AddAppointmentDialog } from './add-appointment-dialog';
 
 type AppointmentSchedulerProps = {
   appointments: Appointment[];
@@ -49,8 +50,14 @@ export function AppointmentScheduler({ appointments, doctors }: AppointmentSched
               Available Slots for {date ? format(date, 'PPP') : 'today'}
             </h3>
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-              {availableSlots.map(slot => (
-                <Button key={slot} variant="outline">{slot}</Button>
+              {date && availableSlots.map(slot => (
+                <AddAppointmentDialog 
+                  key={slot} 
+                  selectedDate={date} 
+                  timeSlot={slot} 
+                  doctors={doctors}
+                  userId="user123" 
+                />
               ))}
                {availableSlots.length === 0 && <p className="col-span-full text-sm text-muted-foreground">No available slots for this day.</p>}
             </div>
