@@ -1,10 +1,11 @@
 'use server';
 
-import { aiHealthChatbot } from '@/ai/flows/ai-health-chatbot';
-import { analyzeHealthStatsAndGenerateAlerts } from '@/ai/flows/automated-health-alerts';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
+import { aiHealthChatbot } from '@/ai/flows/ai-health-chatbot';
+import { analyzeHealthStatsAndGenerateAlerts } from '@/ai/flows/automated-health-alerts';
 
+// Schemas
 const healthStatSchema = z.object({
   systolic: z.coerce.number().min(50).max(300),
   diastolic: z.coerce.number().min(30).max(200),
@@ -16,7 +17,7 @@ const healthStatSchema = z.object({
 const appointmentSchema = z.object({
   patientName: z.string().min(1),
   doctorId: z.string().min(1),
-  // Accepts an ISO datetime string (e.g. "2025-11-14T15:00:00.000Z")
+  // ISO datetime string
   datetime: z.string().refine((s) => !Number.isNaN(Date.parse(s)), {
     message: 'datetime must be a valid ISO date string',
   }),
@@ -32,8 +33,10 @@ const reminderSchema = z.object({
   userId: z.string().min(1).optional(),
 });
 
+// Actions
+
 export async function submitHealthStat(values: unknown) {
-  console.log('[submitHealthStat] incoming values:', values);
+  console.log('[submitHealthStat] incoming:', values);
   try {
     const parsed = healthStatSchema.parse(values);
     console.log('[submitHealthStat] parsed:', parsed);
@@ -45,6 +48,7 @@ export async function submitHealthStat(values: unknown) {
       weight: parsed.weight,
       heartRate: parsed.heartRate,
       timestamp: new Date().toISOString(),
+      // Replace with real session/user data where appropriate
       userId: 'user123',
       userName: 'Jane Doe',
       doctorId: 'doc456',
@@ -64,12 +68,12 @@ export async function submitHealthStat(values: unknown) {
 
 export async function getChatbotResponse(userId: string, question: string) {
   console.log('[getChatbotResponse] userId:', userId, 'question:', question);
-  const trimmedQ = question?.trim();
-  if (!trimmedQ) return { success: false, errorType: 'validation', message: 'Empty question' };
+  const trimmed = question?.trim();
+  if (!trimmed) return { success: false, errorType: 'validation', message: 'Empty question' };
   if (!userId || !userId.trim()) return { success: false, errorType: 'validation', message: 'Invalid userId' };
 
   try {
-    const response = await aiHealthChatbot({ userId: userId.trim(), question: trimmedQ });
+    const response = await aiHealthChatbot({ userId: userId.trim(), question: trimmed });
     console.log('[getChatbotResponse] response:', response);
     return { success: true, response };
   } catch (err) {
@@ -79,7 +83,7 @@ export async function getChatbotResponse(userId: string, question: string) {
 }
 
 export async function submitAppointment(values: unknown) {
-  console.log('[submitAppointment] incoming values:', values);
+  console.log('[submitAppointment] incoming:', values);
   try {
     const parsed = appointmentSchema.parse(values);
     const appointment = {
@@ -91,6 +95,7 @@ export async function submitAppointment(values: unknown) {
       createdAt: new Date().toISOString(),
     };
     console.log('[submitAppointment] created:', appointment);
+    // TODO: persist appointment to DB
     return { success: true, appointment };
   } catch (err) {
     console.error('[submitAppointment] error:', err);
@@ -100,7 +105,7 @@ export async function submitAppointment(values: unknown) {
 }
 
 export async function submitSOS(values: unknown) {
-  console.log('[submitSOS] incoming values:', values);
+  console.log('[submitSOS] incoming:', values);
   try {
     const schema = z.object({
       userId: z.string().min(1),
@@ -117,6 +122,7 @@ export async function submitSOS(values: unknown) {
       createdAt: new Date().toISOString(),
     };
     console.log('[submitSOS] created:', sos);
+    // TODO: persist / notify emergency contacts
     return { success: true, sos };
   } catch (err) {
     console.error('[submitSOS] error:', err);
@@ -126,7 +132,7 @@ export async function submitSOS(values: unknown) {
 }
 
 export async function submitReminder(values: unknown) {
-  console.log('[submitReminder] incoming values:', values);
+  console.log('[submitReminder] incoming:', values);
   try {
     const parsed = reminderSchema.parse(values);
     const reminder = {
@@ -138,6 +144,7 @@ export async function submitReminder(values: unknown) {
       createdAt: new Date().toISOString(),
     };
     console.log('[submitReminder] created:', reminder);
+    // TODO: persist reminder to DB
     return { success: true, reminder };
   } catch (err) {
     console.error('[submitReminder] error:', err);
