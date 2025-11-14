@@ -110,7 +110,7 @@ export function AIHealthChatbot({ user }: AIHealthChatbotProps) {
                 <div className="max-w-md rounded-lg bg-muted px-4 py-3">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Typing...</span>
+                    <span>Thinking...</span>
                   </div>
                 </div>
               </div>
