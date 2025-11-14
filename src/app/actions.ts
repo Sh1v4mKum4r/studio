@@ -5,7 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { aiHealthChatbot } from '@/ai/flows/ai-health-chatbot';
 import { analyzeHealthStatsAndGenerateAlerts } from '@/ai/flows/automated-health-alerts';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { getFirestore } from 'firebase-admin/firestore';
+import { initializeServerApp } from '@/firebase/server';
 
 // Schemas
 const healthStatSchema = z.object({
@@ -45,7 +46,7 @@ export async function submitHealthStat(values: unknown) {
     const parsed = healthStatSchema.parse(values);
     console.log('[submitHealthStat] parsed:', parsed);
 
-    const { firestore } = initializeFirebase();
+    const { firestore } = initializeServerApp();
     const healthStatsCol = collection(firestore, `users/${parsed.userId}/health_stats`);
 
     const statDoc = {
@@ -59,7 +60,7 @@ export async function submitHealthStat(values: unknown) {
       heartRate: parsed.heartRate,
     };
 
-    addDoc(healthStatsCol, statDoc).catch((e) => console.error(e));
+    await addDoc(healthStatsCol, statDoc);
 
     const result = await analyzeHealthStatsAndGenerateAlerts({
       systolic: parsed.systolic,
