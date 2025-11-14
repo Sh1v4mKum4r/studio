@@ -1,13 +1,19 @@
+
+'use client';
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ShieldAlert } from "lucide-react";
 import { AddHealthStatDialog } from "../dashboard/add-health-stat-dialog";
+import SOSButton from "../sos/sos-button";
+import { useUser } from "@/firebase";
 
 type AppHeaderProps = {
   userName: string;
 }
 
 export function AppHeader({ userName }: AppHeaderProps) {
+  const { user } = useUser();
+
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
       <SidebarTrigger className="md:hidden" />
@@ -19,10 +25,9 @@ export function AppHeader({ userName }: AppHeaderProps) {
         </div>
         <div className="flex items-center gap-2">
           <AddHealthStatDialog />
-          <Button variant="destructive" size="sm">
-            <ShieldAlert className="h-4 w-4" />
-            <span className="ml-2 hidden sm:inline">SOS</span>
-          </Button>
+          {user && (
+            <SOSButton userId={user.uid} />
+          )}
         </div>
       </div>
     </header>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,10 +11,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { usePathname } from "next/navigation";
-import type { User } from "@/lib/types";
+import { usePathname, useRouter } from "next/navigation";
+import type { User } from "firebase/auth";
 import {
   Bell,
   CalendarDays,
@@ -23,6 +23,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/firebase";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -37,6 +38,13 @@ type AppSidebarProps = {
 
 export function AppSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await auth.signOut();
+    router.push('/login');
+  };
 
   return (
     <Sidebar>
@@ -69,15 +77,15 @@ export function AppSidebar({ user }: AppSidebarProps) {
       <SidebarFooter className="border-t p-2">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint={user.imageHint} />
-            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+            <AvatarImage src={user.photoURL || undefined} alt={user.displayName || ''} />
+            <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex-1 overflow-hidden">
-            <p className="truncate font-medium">{user.name}</p>
+            <p className="truncate font-medium">{user.displayName || 'User'}</p>
             <p className="truncate text-sm text-muted-foreground">{user.email}</p>
           </div>
         </div>
-        <Button variant="ghost" className="mt-2 w-full justify-start">
+        <Button variant="ghost" className="mt-2 w-full justify-start" onClick={handleLogout}>
           <LogOut className="mr-2" />
           Logout
         </Button>

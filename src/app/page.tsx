@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { HeartPulse } from 'lucide-react';
@@ -36,7 +37,7 @@ export default function Home() {
                 Monitor your health, connect with your doctor, and stay informed every step of the way.
             </p>
             <Button asChild size="lg" className="mt-8">
-                <Link href="/dashboard">Access Your Dashboard</Link>
+                <Link href="/login">Access Your Dashboard</Link>
             </Button>
             </div>
         </div>

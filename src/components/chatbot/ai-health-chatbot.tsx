@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getChatbotResponse } from '@/app/actions';
-import type { ChatMessage, User } from '@/lib/types';
+import type { ChatMessage } from '@/lib/types';
+import type { User } from 'firebase/auth';
 import { Send, Loader2, HeartPulse } from 'lucide-react';
 
 type AIHealthChatbotProps = {
@@ -49,7 +50,7 @@ export function AIHealthChatbot({ user }: AIHealthChatbotProps) {
     setInputValue('');
 
     startTransition(async () => {
-      const response = await getChatbotResponse(user.userId, inputValue);
+      const response = await getChatbotResponse(user.uid, inputValue);
       const assistantMessage: ChatMessage = {
         id: Date.now().toString() + 'ai',
         role: 'assistant',
@@ -95,8 +96,8 @@ export function AIHealthChatbot({ user }: AIHealthChatbotProps) {
                 </div>
                  {message.role === 'user' && (
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint={user.imageHint} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={user.photoURL || undefined} alt={user.displayName || ''} />
+                    <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 )}
               </div>

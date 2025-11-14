@@ -1,9 +1,14 @@
+
+'use client';
 import { AIHealthChatbot } from "@/components/chatbot/ai-health-chatbot";
-import { mockUser } from "@/lib/data";
+import { useUser } from "@/firebase";
 
 export default function ChatbotPage() {
-    // In real app, get user from session
-    const user = mockUser;
+    const { user } = useUser();
+
+    if (!user) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="h-full">
