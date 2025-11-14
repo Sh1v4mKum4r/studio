@@ -36,9 +36,10 @@ type AddAppointmentDialogProps = {
   timeSlot: string;
   doctors: Doctor[];
   userId: string;
+  onAppointmentBooked: (newAppointment: any) => void;
 };
 
-export function AddAppointmentDialog({ selectedDate, timeSlot, doctors, userId }: AddAppointmentDialogProps) {
+export function AddAppointmentDialog({ selectedDate, timeSlot, doctors, userId, onAppointmentBooked }: AddAppointmentDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -64,21 +65,23 @@ export function AddAppointmentDialog({ selectedDate, timeSlot, doctors, userId }
     const result = await submitAppointment({
       ...values,
       datetime: appointmentDateTime.toISOString(),
+      userId,
     });
 
     setIsSubmitting(false);
 
-    if (result.success) {
+    if (result.success && result.appointment) {
       toast({
-        title: 'Appointment Scheduled!',
-        description: `Your appointment with Dr. ${doctors.find(d => d.doctorId === values.doctorId)?.name} has been booked.`,
+        title: 'Appointment Requested!',
+        description: `Your appointment request has been sent and is now pending confirmation.`,
       });
+      onAppointmentBooked(result.appointment);
       form.reset();
       setIsOpen(false);
     } else {
       toast({
         title: 'Error',
-        description: result.error || 'Something went wrong.',
+        description: 'Something went wrong.',
         variant: 'destructive',
       });
     }

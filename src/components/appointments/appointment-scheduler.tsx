@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import type { Appointment, Doctor } from '@/lib/types';
 import { format, isSameDay, isAfter, startOfToday } from 'date-fns';
 import { AddAppointmentDialog } from './add-appointment-dialog';
+import { Badge } from '@/components/ui/badge';
 
 type AppointmentSchedulerProps = {
   appointments: Appointment[];
@@ -19,8 +20,13 @@ const timeSlots = [
   "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM",
 ];
 
-export function AppointmentScheduler({ appointments, doctors }: AppointmentSchedulerProps) {
+export function AppointmentScheduler({ appointments: initialAppointments, doctors }: AppointmentSchedulerProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
+
+  const handleAppointmentBooked = (newAppointment: Appointment) => {
+    setAppointments(prev => [...prev, newAppointment]);
+  }
   
   const selectedDayAppointments = appointments.filter(
     (appt) => date && isSameDay(new Date(appt.date), date)
@@ -29,6 +35,15 @@ export function AppointmentScheduler({ appointments, doctors }: AppointmentSched
   const availableSlots = timeSlots.filter(
     slot => !selectedDayAppointments.some(appt => appt.time === slot)
   );
+
+  const statusVariant = (status: 'confirmed' | 'pending' | 'cancelled') => {
+    switch (status) {
+      case 'confirmed': return 'default';
+      case 'pending': return 'secondary';
+      case 'cancelled': return 'destructive';
+      default: return 'outline';
+    }
+  }
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -57,6 +72,7 @@ export function AppointmentScheduler({ appointments, doctors }: AppointmentSched
                   timeSlot={slot} 
                   doctors={doctors}
                   userId="user123" 
+                  onAppointmentBooked={handleAppointmentBooked}
                 />
               ))}
                {availableSlots.length === 0 && <p className="col-span-full text-sm text-muted-foreground">No available slots for this day.</p>}
@@ -75,14 +91,14 @@ export function AppointmentScheduler({ appointments, doctors }: AppointmentSched
             {appointments.map((appt) => {
               const doctor = doctors.find(d => d.doctorId === appt.doctorId);
               return (
-                <li key={appt.apptId} className="p-2 rounded-md border">
-                  <p className="font-semibold">{appt.reason}</p>
+                <li key={appt.apptId} className="p-3 rounded-md border space-y-1">
+                  <div className='flex justify-between items-start'>
+                    <p className="font-semibold">{appt.reason}</p>
+                    <Badge variant={statusVariant(appt.status)} className='capitalize'>{appt.status}</Badge>
+                  </div>
                   <p className="text-sm">With: {doctor?.name}</p>
                   <p className="text-sm text-muted-foreground">
                     {format(new Date(appt.date), "EEE, MMM d, yyyy")} at {appt.time}
-                  </p>
-                  <p className={`text-sm font-medium ${appt.status === 'confirmed' ? 'text-green-600' : 'text-yellow-600'}`}>
-                    Status: {appt.status}
                   </p>
                 </li>
               );

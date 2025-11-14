@@ -45,8 +45,6 @@ export async function submitHealthStat(values: unknown) {
       systolic: parsed.systolic,
       diastolic: parsed.diastolic,
       sugarLevel: parsed.sugarLevel,
-      weight: parsed.weight,
-      heartRate: parsed.heartRate,
       timestamp: new Date().toISOString(),
       // Replace with real session/user data where appropriate
       userId: 'user123',
@@ -75,7 +73,7 @@ export async function getChatbotResponse(userId: string, question: string) {
   try {
     const response = await aiHealthChatbot({ userId: userId.trim(), question: trimmed });
     console.log('[getChatbotResponse] response:', response);
-    return { success: true, response };
+    return { success: true, ...response };
   } catch (err) {
     console.error('[getChatbotResponse] error:', err);
     return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
@@ -86,12 +84,16 @@ export async function submitAppointment(values: unknown) {
   console.log('[submitAppointment] incoming:', values);
   try {
     const parsed = appointmentSchema.parse(values);
+    const appointmentDate = new Date(parsed.datetime);
     const appointment = {
-      id: uuidv4(),
+      apptId: uuidv4(),
       patientName: parsed.patientName,
+      userId: 'user123',
       doctorId: parsed.doctorId,
-      datetime: new Date(parsed.datetime).toISOString(),
+      date: appointmentDate.toISOString().split('T')[0],
+      time: appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       reason: parsed.reason ?? null,
+      status: 'pending' as const,
       createdAt: new Date().toISOString(),
     };
     console.log('[submitAppointment] created:', appointment);
