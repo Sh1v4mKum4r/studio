@@ -48,7 +48,7 @@ service cloud.firestore {
 
       allow create: if isOwner(userId) && request.resource.data.id == userId;
       allow get: if isOwner(userId);
-      allow list: if false;
+      allow list: if isSignedIn();
       allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
       allow delete: if isExistingOwner(userId);
     }
@@ -154,11 +154,7 @@ service cloud.firestore {
             return request.auth != null;
         }
 
-        allow create: if false;
-        allow get: if isSignedIn();
-        allow list: if isSignedIn();
-        allow update: if false;
-        allow delete: if false;
+        allow read, write: if isSignedIn();
     }
 
     /**
@@ -177,7 +173,7 @@ service cloud.firestore {
 
       allow create: if isSignedIn() && request.auth.uid == request.resource.data.patientId;
       allow get: if isSignedIn() && (request.auth.uid == resource.data.patientId || get(/databases/$(database)/documents/doctors/$(resource.data.doctorId)).data.userId == request.auth.uid);
-      allow list: if isSignedIn() && (request.query.field == 'patientId' && request.query.value == request.auth.uid) || (request.query.field == 'doctorId' && get(/databases/$(database)/documents/doctors/$(request.query.value)).data.userId == request.auth.uid);
+      allow list: if isSignedIn() && (request.query.where.field == 'patientId' && request.query.where.value == request.auth.uid) || (request.query.where.field == 'doctorId' && get(/databases/$(database)/documents/doctors/$(request.query.where.value)).data.userId == request.auth.uid);
       allow update: if isSignedIn() && (request.auth.uid == resource.data.patientId || get(/databases/$(database)/documents/doctors/$(resource.data.doctorId)).data.userId == request.auth.uid) && resource != null;
       allow delete: if isSignedIn() && (request.auth.uid == resource.data.patientId || get(/databases/$(database)/documents/doctors/$(resource.data.doctorId)).data.userId == request.auth.uid) && resource != null;
     }
