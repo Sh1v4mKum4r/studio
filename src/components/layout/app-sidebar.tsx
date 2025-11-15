@@ -21,6 +21,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageCircle,
+  Info,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/firebase";
@@ -30,6 +31,7 @@ const navItems = [
   { href: "/dashboard/appointments", icon: CalendarDays, label: "Appointments" },
   { href: "/dashboard/reminders", icon: Bell, label: "Reminders" },
   { href: "/dashboard/chatbot", icon: MessageCircle, label: "AI Chatbot" },
+  { href: "http://13.60.211.180/", icon: Info, label: "Learn More", target: "_blank" },
 ];
 
 type AppSidebarProps = {
@@ -60,14 +62,16 @@ export function AppSidebar({ user }: AppSidebarProps) {
         <SidebarMenu>
           {navItems.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <Link href={item.href} passHref>
-                <SidebarMenuButton
-                  isActive={pathname === item.href}
-                  tooltip={item.label}
-                >
-                  <item.icon />
-                  <span>{item.label}</span>
-                </SidebarMenuButton>
+              <Link href={item.href} passHref legacyBehavior>
+                <a target={item.target} rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}>
+                  <SidebarMenuButton
+                    isActive={pathname === item.href}
+                    tooltip={item.label}
+                  >
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </a>
               </Link>
             </SidebarMenuItem>
           ))}
