@@ -7,18 +7,16 @@ import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebas
 import { collection, query, where } from "firebase/firestore";
 import type { Appointment } from "@/lib/types";
 
-export default function AppointmentsPage() {
-    const { user } = useUser();
-    const firestore = useFirestore();
-
+// This component contains the main logic and is rendered only when user and firestore are available.
+function AppointmentsView({ user, firestore }: { user: NonNullable<ReturnType<typeof useUser>['user']>, firestore: NonNullable<ReturnType<typeof useFirestore>> }) {
     const appointmentsQuery = useMemoFirebase(() => {
-        if (!user || !firestore) return null;
+        // We know user and firestore are defined here.
         return query(collection(firestore, 'appointments'), where('patientId', '==', user.uid));
-    }, [user, firestore]);
+    }, [user.uid, firestore]);
 
     const { data: appointments, isLoading } = useCollection<Appointment>(appointmentsQuery);
 
-    if (isLoading || !user) {
+    if (isLoading) {
         return <div>Loading appointments...</div>;
     }
 
@@ -32,4 +30,18 @@ export default function AppointmentsPage() {
             <AppointmentScheduler appointments={appointments || []} doctors={doctors} />
         </div>
     );
+}
+
+
+export default function AppointmentsPage() {
+    const { user, isUserLoading } = useUser();
+    const firestore = useFirestore();
+
+    // Show a loading state while user or firestore are initializing.
+    if (isUserLoading || !user || !firestore) {
+        return <div>Loading...</div>;
+    }
+    
+    // Once everything is loaded, render the component that performs the query.
+    return <AppointmentsView user={user} firestore={firestore} />;
 }
