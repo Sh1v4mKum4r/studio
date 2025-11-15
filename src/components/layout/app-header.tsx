@@ -16,13 +16,15 @@ export function AppHeader({ userName }: AppHeaderProps) {
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
-      <SidebarTrigger className="md:hidden" />
-      <div className="flex w-full items-center justify-end md:justify-between">
-        <div className="hidden items-center gap-4 md:flex">
-          <h1 className="text-xl font-semibold">
-            Welcome back, {userName}!
-          </h1>
-        </div>
+      <div className="flex w-full items-center justify-between">
+         <div className="flex items-center gap-4">
+            <SidebarTrigger className="md:hidden" />
+            <div className="hidden items-center gap-4 md:flex">
+              <h1 className="text-xl font-semibold">
+                Welcome back, {userName}!
+              </h1>
+            </div>
+         </div>
         <div className="flex items-center gap-2">
           <AddHealthStatDialog />
           {user && (

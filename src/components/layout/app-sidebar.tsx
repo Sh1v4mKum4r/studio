@@ -4,6 +4,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -48,6 +52,9 @@ export function AppSidebar({ user }: AppSidebarProps) {
 
   return (
     <Sidebar>
+        <SheetHeader>
+            <SheetTitle className="sr-only">Sidebar Navigation</SheetTitle>
+        </SheetHeader>
       <SidebarHeader className="border-b">
         <div className="flex items-center gap-2">
           <HeartPulse className="h-8 w-8 text-primary" />
@@ -62,7 +69,6 @@ export function AppSidebar({ user }: AppSidebarProps) {
             <SidebarMenuItem key={item.href}>
               <Link href={item.href} passHref>
                 <SidebarMenuButton
-                  as="a"
                   isActive={pathname === item.href}
                   tooltip={item.label}
                 >
