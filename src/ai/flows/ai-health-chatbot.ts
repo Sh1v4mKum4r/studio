@@ -89,6 +89,9 @@ const aiHealthChatbotFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await prompt(input);
-    return output!;
+    if (!output) {
+      return 'I apologize, but I was unable to generate a response at this time. Please try again.';
+    }
+    return output;
   }
 );
