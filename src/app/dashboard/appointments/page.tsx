@@ -38,8 +38,14 @@ export default function AppointmentsPage() {
     const firestore = useFirestore();
 
     // Show a loading state while user or firestore are initializing.
-    if (isUserLoading || !user || !firestore) {
+    if (isUserLoading || !firestore) {
         return <div>Loading...</div>;
+    }
+    
+    if (!user) {
+        // This can happen briefly or if the user is logged out.
+        // You might want to redirect to login here or show a message.
+        return <div>Please log in to see your appointments.</div>;
     }
     
     // Once everything is loaded, render the component that performs the query.
