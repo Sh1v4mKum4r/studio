@@ -55,31 +55,8 @@ const getUserHealthData = ai.defineTool(
             appointments,
         };
     }
-)
+);
 
-const prompt = ai.definePrompt({
-  name: 'aiHealthChatbotPrompt',
-  input: { schema: ChatbotInputSchema },
-  output: { schema: ChatbotOutputSchema },
-  model: 'googleai/gemini-2.5-flash',
-  tools: [getUserHealthData],
-  prompt: `You are a helpful AI assistant for pregnant mothers. Your name is VitalSync Assistant.
-    If the user asks a question about their health, use the getUserHealthData tool to get their latest health data and appointments.
-    Answer the user's question based on the data provided by the tool.
-    Be friendly, empathetic, and provide clear, concise information.
-    If the data indicates a potential health risk, advise the user to contact their doctor.
-    Do not provide medical advice that is not supported by the data.
-    Keep your answers short and to the point.
-    Your response must be the raw string content of the answer, not a JSON object.
-    
-    Chat History:
-    {{#each history}}
-    {{role}}: {{text}}
-    {{/each}}
-    
-    New question from user: {{{question}}}
-  `,
-});
 
 const aiHealthChatbotFlow = ai.defineFlow(
   {
@@ -88,10 +65,26 @@ const aiHealthChatbotFlow = ai.defineFlow(
     outputSchema: ChatbotOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
-    if (!output) {
-      return 'I apologize, but I was unable to generate a response at this time. Please try again.';
-    }
-    return output;
+    const systemPrompt = `You are a helpful AI assistant for pregnant mothers. Your name is VitalSync Assistant.
+If the user asks a question about their health, use the getUserHealthData tool to get their latest health data and appointments.
+Answer the user's question based on the data provided by the tool.
+Be friendly, empathetic, and provide clear, concise information.
+If the data indicates a potential health risk, advise the user to contact their doctor.
+Do not provide medical advice that is not supported by the data.
+Keep your answers short and to the point.
+Your response must be the raw string content of the answer, not a JSON object.`;
+
+    const chatHistory = input.history.map(msg => `${msg.role}: ${msg.text}`).join('\n');
+
+    const fullPrompt = `${systemPrompt}\n\nChat History:\n${chatHistory}\n\nNew question from user: ${input.question}`;
+
+    const { text } = await ai.generate({
+        model: 'googleai/gemini-2.5-flash',
+        prompt: fullPrompt,
+        tools: [getUserHealthData],
+        input: input,
+    });
+
+    return text || 'I apologize, but I could not generate a response at this time. Please try again later.';
   }
 );
