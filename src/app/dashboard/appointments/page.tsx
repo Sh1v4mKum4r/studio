@@ -6,9 +6,11 @@ import { mockDoctors } from "@/lib/data";
 import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
 import { collection, query, where } from "firebase/firestore";
 import type { Appointment } from "@/lib/types";
+import type { User } from 'firebase/auth';
+import type { Firestore } from 'firebase/firestore';
 
 // This component contains the main logic and is rendered only when user and firestore are available.
-function AppointmentsView({ user, firestore }: { user: NonNullable<ReturnType<typeof useUser>['user']>, firestore: NonNullable<ReturnType<typeof useFirestore>> }) {
+function AppointmentsView({ user, firestore }: { user: User, firestore: Firestore }) {
     const appointmentsQuery = useMemoFirebase(() => {
         // We know user and firestore are defined here.
         return query(collection(firestore, 'appointments'), where('patientId', '==', user.uid));
