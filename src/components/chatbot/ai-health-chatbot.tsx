@@ -51,7 +51,7 @@ export function AIHealthChatbot({ user }: AIHealthChatbotProps) {
 
     startTransition(async () => {
       const response = await getChatbotResponse(user.uid, inputValue);
-      if (response.success) {
+      if (response.success && response.answer) {
         const assistantMessage: ChatMessage = {
           id: Date.now().toString() + 'ai',
           role: 'assistant',

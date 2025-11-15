@@ -68,16 +68,21 @@ export async function submitHealthStat(values: unknown) {
 export async function getChatbotResponse(userId: string, question: string) {
   console.log('[getChatbotResponse] userId:', userId, 'question:', question);
   const trimmed = question?.trim();
-  if (!trimmed) return { success: false, errorType: 'validation', message: 'Empty question' };
-  if (!userId || !userId.trim()) return { success: false, errorType: 'validation', message: 'Invalid userId' };
+  if (!trimmed) {
+    return { success: false, error: 'Question cannot be empty.' };
+  }
+  if (!userId || !userId.trim()) {
+    return { success: false, error: 'Invalid user ID.' };
+  }
 
   try {
     const response = await aiHealthChatbot({ userId: userId.trim(), question: trimmed });
     console.log('[getChatbotResponse] response:', response);
-    return { success: true, ...response };
+    return { success: true, answer: response.answer };
   } catch (err) {
     console.error('[getChatbotResponse] error:', err);
-    return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    return { success: false, error: errorMessage };
   }
 }
 

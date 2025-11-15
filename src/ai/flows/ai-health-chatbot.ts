@@ -10,7 +10,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {mockHealthStats, mockUser} from '@/lib/data';
+import {mockHealthStats} from '@/lib/data';
 import {z} from 'genkit';
 
 const HealthStatSchema = z.object({
@@ -70,7 +70,9 @@ const prompt = ai.definePrompt({
   tools: [getHealthDataTool],
   system: `You are a helpful AI assistant for pregnant mothers. Your role is to provide personalized advice based on their questions and health data.
 
-If the user asks a question about their health data (e.g., blood pressure, weight, sugar levels), use the getUserHealthData tool to retrieve their latest measurements before answering.`,
+If the user asks a question about their health data (e.g., blood pressure, weight, sugar levels), use the getUserHealthData tool to retrieve their latest measurements before answering.
+
+When providing advice, be empathetic, clear, and encouraging. Always recommend that the user consults with their healthcare provider for any serious concerns.`,
   prompt: `Here is the user's question: {{{question}}}
 The User ID is: {{{userId}}}`,
   model: 'googleai/gemini-2.5-flash',
@@ -84,7 +86,9 @@ const aiHealthChatbotFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      throw new Error("The AI model did not return a response.");
+    }
+    return output;
   }
 );
-
