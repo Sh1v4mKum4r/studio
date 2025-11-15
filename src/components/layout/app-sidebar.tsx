@@ -20,7 +20,6 @@ import {
   HeartPulse,
   LayoutDashboard,
   LogOut,
-  MessageCircle,
   Info,
 } from "lucide-react";
 import Link from "next/link";
@@ -30,7 +29,6 @@ const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/dashboard/appointments", icon: CalendarDays, label: "Appointments" },
   { href: "/dashboard/reminders", icon: Bell, label: "Reminders" },
-  { href: "/dashboard/chatbot", icon: MessageCircle, label: "AI Chatbot" },
   { href: "http://13.60.211.180/", icon: Info, label: "Learn More", target: "_blank" },
 ];
 

@@ -3,7 +3,6 @@
 
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
-import { aiHealthChatbot } from '@/ai/flows/ai-health-chatbot';
 import { analyzeHealthStatsAndGenerateAlerts } from '@/ai/flows/automated-health-alerts';
 import { initializeServerApp } from '@/firebase/server';
 
@@ -62,27 +61,6 @@ export async function submitHealthStat(values: unknown) {
       return { success: false, errorType: 'validation', issues: err.errors, message: err.message };
     }
     return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
-  }
-}
-
-export async function getChatbotResponse(userId: string, question: string) {
-  console.log('[getChatbotResponse] userId:', userId, 'question:', question);
-  const trimmed = question?.trim();
-  if (!trimmed) {
-    return { success: false, error: 'Question cannot be empty.' };
-  }
-  if (!userId || !userId.trim()) {
-    return { success: false, error: 'Invalid user ID.' };
-  }
-
-  try {
-    const response = await aiHealthChatbot({ userId: userId.trim(), question: trimmed });
-    console.log('[getChatbotResponse] response:', response);
-    return { success: true, answer: response.answer };
-  } catch (err) {
-    console.error('[getChatbotResponse] error:', err);
-    const errorMessage = err instanceof Error ? err.message : String(err);
-    return { success: false, error: errorMessage };
   }
 }
 
