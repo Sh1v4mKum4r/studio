@@ -62,23 +62,24 @@ const prompt = ai.definePrompt({
   output: { schema: ChatbotOutputSchema },
   model: 'googleai/gemini-2.5-flash',
   tools: [getUserHealthData],
-  system: `You are a helpful AI assistant for pregnant mothers. Your name is VitalSync Assistant.
+  prompt: `You are a helpful AI assistant for pregnant mothers. Your name is VitalSync Assistant.
     If the user asks a question about their health, use the getUserHealthData tool to get their latest health data and appointments.
     Answer the user's question based on the data provided by the tool.
     Be friendly, empathetic, and provide clear, concise information.
     If the data indicates a potential health risk, advise the user to contact their doctor.
     Do not provide medical advice that is not supported by the data.
-    Keep your answers short and to the point.`,
-  prompt: `New question from user: {{{question}}}
-
-  Chat History:
-  {{#each history}}
-    {{#if (eq role 'user')}}
-      User: {{text}}
-    {{else}}
-      Assistant: {{text}}
-    {{/if}}
-  {{/each}}
+    Keep your answers short and to the point.
+    
+    Chat History:
+    {{#each history}}
+        {{#if (eq role 'user')}}
+        User: {{text}}
+        {{else}}
+        Assistant: {{text}}
+        {{/if}}
+    {{/each}}
+    
+    New question from user: {{{question}}}
   `,
 });
 
