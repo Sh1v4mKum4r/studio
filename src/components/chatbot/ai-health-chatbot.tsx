@@ -54,15 +54,16 @@ export function AiHealthChatbot() {
         const errorMessage: ChatMessage = {
           id: uuidv4(),
           role: 'assistant',
-          text: 'Sorry, I encountered an error. Please try again.',
+          text: `Sorry, I encountered an error. ${response?.message ? `Details: ${response.message}` : 'Please try again.'}`,
         };
         setMessages((prev) => [...prev, errorMessage]);
       }
     } catch (error) {
+       const err = error as Error;
       const errorMessage: ChatMessage = {
         id: uuidv4(),
         role: 'assistant',
-        text: 'Sorry, something went wrong. Please try again later.',
+        text: `Sorry, something went wrong. Details: ${err.message}`,
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
