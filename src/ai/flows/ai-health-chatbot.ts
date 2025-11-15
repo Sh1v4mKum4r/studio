@@ -68,12 +68,11 @@ const prompt = ai.definePrompt({
   input: {schema: AiHealthChatbotInputSchema},
   output: {schema: AiHealthChatbotOutputSchema},
   tools: [getHealthDataTool],
-  prompt: `You are a helpful AI assistant for pregnant mothers. Your role is to provide personalized advice based on their questions and health data.
+  system: `You are a helpful AI assistant for pregnant mothers. Your role is to provide personalized advice based on their questions and health data.
 
-  If the user asks a question about their health data (e.g., blood pressure, weight, sugar levels), use the getUserHealthData tool to retrieve their latest measurements before answering.
-
-  Here is the user's question: {{{question}}}
-  The User ID is: {{{userId}}}`,
+If the user asks a question about their health data (e.g., blood pressure, weight, sugar levels), use the getUserHealthData tool to retrieve their latest measurements before answering.`,
+  prompt: `Here is the user's question: {{{question}}}
+The User ID is: {{{userId}}}`,
   model: 'googleai/gemini-2.5-flash',
 });
 
