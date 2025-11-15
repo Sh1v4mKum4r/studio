@@ -54,8 +54,10 @@ export async function getChatbotResponse(values: unknown) {
       history: parsed.history,
     });
 
-    console.log('[getChatbotResponse] analyzer result:', result);
-    return { success: true, answer: result };
+    const answer = result ?? 'I apologize, but I was unable to generate a response at this time. Please try again.';
+
+    console.log('[getChatbotResponse] analyzer result:', answer);
+    return { success: true, answer: answer };
   } catch (err) {
     console.error('[getChatbotResponse] error:', err);
     if (err instanceof z.ZodError) {
