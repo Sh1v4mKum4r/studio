@@ -4,6 +4,7 @@
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { analyzeHealthStatsAndGenerateAlerts } from '@/ai/flows/automated-health-alerts';
+import { getChatbotResponse as getChatbotResponseFlow } from '@/ai/flows/ai-health-chatbot';
 import { initializeServerApp } from '@/firebase/server';
 
 // Schemas
@@ -31,7 +32,38 @@ const reminderSchema = z.object({
   userId: z.string().min(1).optional(),
 });
 
+const chatbotSchema = z.object({
+    message: z.string().min(1),
+    userId: z.string().min(1),
+    history: z.array(z.object({
+        role: z.enum(['user', 'assistant']),
+        text: z.string(),
+    })),
+});
+
 // Actions
+
+export async function getChatbotResponse(values: unknown) {
+  console.log('[getChatbotResponse] incoming for AI analysis:', values);
+  try {
+    const parsed = chatbotSchema.parse(values);
+    
+    const result = await getChatbotResponseFlow({
+      question: parsed.message,
+      userId: parsed.userId,
+      history: parsed.history,
+    });
+
+    console.log('[getChatbotResponse] analyzer result:', result);
+    return { success: true, answer: result };
+  } catch (err) {
+    console.error('[getChatbotResponse] error:', err);
+    if (err instanceof z.ZodError) {
+      return { success: false, errorType: 'validation', issues: err.errors, message: err.message };
+    }
+    return { success: false, errorType: 'internal', message: (err as Error)?.message ?? String(err) };
+  }
+}
 
 export async function submitHealthStat(values: unknown) {
   console.log('[submitHealthStat] incoming for AI analysis:', values);

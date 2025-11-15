@@ -48,3 +48,9 @@ export type Reminder = {
   datetime?: string;
   note?: string | null;
 };
+
+export type ChatMessage = {
+  id: string;
+  role: 'user' | 'assistant';
+  text: string;
+};
