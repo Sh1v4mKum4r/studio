@@ -51,12 +51,21 @@ export function AIHealthChatbot({ user }: AIHealthChatbotProps) {
 
     startTransition(async () => {
       const response = await getChatbotResponse(user.uid, inputValue);
-      const assistantMessage: ChatMessage = {
-        id: Date.now().toString() + 'ai',
-        role: 'assistant',
-        content: response.answer || "Sorry, I couldn't get a response. Please try again.",
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+      if (response.success) {
+        const assistantMessage: ChatMessage = {
+          id: Date.now().toString() + 'ai',
+          role: 'assistant',
+          content: response.answer,
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+         const assistantMessage: ChatMessage = {
+            id: Date.now().toString() + 'ai',
+            role: 'assistant',
+            content: "Sorry, I couldn't get a response. Please try again.",
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+      }
     });
   };
 
