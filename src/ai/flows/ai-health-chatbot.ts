@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A health chatbot AI agent that can answer questions about a user's health data.
@@ -69,6 +70,7 @@ const prompt = ai.definePrompt({
     If the data indicates a potential health risk, advise the user to contact their doctor.
     Do not provide medical advice that is not supported by the data.
     Keep your answers short and to the point.
+    Your response must be the raw string content of the answer, not a JSON object.
     
     Chat History:
     {{#each history}}
