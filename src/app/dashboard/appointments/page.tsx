@@ -18,7 +18,7 @@ export default function AppointmentsPage() {
 
     const { data: appointments, isLoading } = useCollection<Appointment>(appointmentsQuery);
 
-    if (isLoading || !appointments) {
+    if (isLoading || !user) {
         return <div>Loading appointments...</div>;
     }
 
