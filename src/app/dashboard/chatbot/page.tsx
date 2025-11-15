@@ -5,15 +5,13 @@ import { AiHealthChatbot } from '@/components/chatbot/ai-health-chatbot';
 
 export default function ChatbotPage() {
     return (
-        <div className="flex flex-col h-[calc(100vh-10rem)]">
+        <div className="h-[calc(100vh-10rem)] flex flex-col">
             <h1 className="text-3xl font-bold mb-4">AI Health Assistant</h1>
             <p className="text-muted-foreground mb-6">
                 Ask questions about your health data, appointments, or general pregnancy-related topics.
             </p>
-            <div className="flex-1 flex flex-col items-center">
-                <div className="w-full max-w-[500px] flex-1 flex flex-col">
-                    <AiHealthChatbot />
-                </div>
+            <div className="mx-auto w-full max-w-[600px] flex-1">
+                <AiHealthChatbot />
             </div>
         </div>
     );
