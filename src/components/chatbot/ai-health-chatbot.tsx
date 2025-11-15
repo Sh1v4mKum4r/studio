@@ -71,8 +71,8 @@ export function AiHealthChatbot() {
   };
 
   return (
-    <div className="flex flex-col h-full border rounded-lg bg-card text-card-foreground shadow-sm">
-      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+    <div className="h-full border rounded-lg bg-card text-card-foreground shadow-sm">
+      <ScrollArea className="h-[calc(100%-4rem)] p-4" ref={scrollAreaRef}>
         <div className="space-y-4">
           {messages.map((message) => (
             <div
@@ -110,7 +110,7 @@ export function AiHealthChatbot() {
           )}
         </div>
       </ScrollArea>
-      <div className="p-4 border-t">
+      <div className="p-4 border-t h-16">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
             value={input}
