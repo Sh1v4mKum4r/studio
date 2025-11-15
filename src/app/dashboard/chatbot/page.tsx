@@ -10,8 +10,10 @@ export default function ChatbotPage() {
             <p className="text-muted-foreground mb-6">
                 Ask questions about your health data, appointments, or general pregnancy-related topics.
             </p>
-            <div className="flex-1 flex flex-col">
-                <AiHealthChatbot />
+            <div className="flex-1 flex flex-col items-center">
+                <div className="w-full max-w-[500px] flex-1 flex flex-col">
+                    <AiHealthChatbot />
+                </div>
             </div>
         </div>
     );
