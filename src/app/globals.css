@@ -83,3 +83,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+#cbox {
+  width: 600px;
+}
