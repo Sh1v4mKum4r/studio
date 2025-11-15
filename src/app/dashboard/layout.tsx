@@ -17,11 +17,14 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
+    // If the user loading has finished and there is no user, redirect to login.
     if (!isUserLoading && !user) {
       router.push('/login');
     }
   }, [user, isUserLoading, router]);
 
+  // While loading, or if there's no user, show a loading screen.
+  // The useEffect above will handle the redirect.
   if (isUserLoading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -30,6 +33,7 @@ export default function DashboardLayout({
     );
   }
 
+  // If the user is authenticated, render the dashboard.
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">
